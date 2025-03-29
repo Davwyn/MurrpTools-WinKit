@@ -2,8 +2,6 @@
 
 ![MurrpTools_Display](https://github.com/user-attachments/assets/967c5d42-681c-47a1-8290-c8942cfef249)
 
-**Warning:** This project is in active development - use at your own risk. Always backup data before use.
-
 ## About MurrpTools
 MurrpTools is an all-in-one Windows toolkit that helps both computer technicians and everyday users:
 - Create customized Windows installation/recovery media
@@ -43,6 +41,11 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 💡 Tip: Get Windows ISO files from [Microsoft's official site](https://www.microsoft.com/software-download/windows11)
 
 ## Getting Started Guide
+
+💡 Tip: As always when using Windows installation software. Make sure you back up any computer you plan to use MurrpTools on.
+   Reinstalling windows, or using tools to erase the disk will result in data loss.
+
+⚠ **Warning:** This project still being tested. - Use at your own risk. Always backup data before use.
 
 1. **Download the Software**
    **Option 1 - Simple ZIP Download:**
@@ -110,8 +113,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    ```
 
 ## Special Thanks
-- **Tiny11 Builder Team** - Custom image inspiration
-- **UUP Dump Project** - ISO creation techniques
+- **Tiny11 Builder Team** - Provided great resources to understand custom image generation.
+- **UUP Dump Project** - Both useful project in general, and their scripts helped to understand customizing Windows images, as well as building the ISO file.
 - **Beta Testers** - Valuable feedback:
   - Aeros Endeem
   - Sky (Skybox Monster)
