@@ -1,0 +1,13 @@
+@echo off
+setlocal EnableDelayedExpansion
+echo Starting WMI Services
+net start winmgmt
+powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+echo *********************
+PATH = %PATH%;X:\Windows\System32\CCTK
+%systemdrive%\Windows\system32\netstart.exe
+Bginfo64.exe %systemdrive%\Windows\System32\bginfo.bgi /NOLICPROMPT /TIMER:0
+pskill64 -accepteula WallpaperHost.exe
+start WallpaperHost.exe
+
+start "" "%systemdrive%\Windows\System32\Launcher.cmd"

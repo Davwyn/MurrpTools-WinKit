@@ -1,0 +1,34 @@
+<Translation>
+ <MainForm>
+   <Label1 Caption="Aktualny stan:"/>
+   <Label3 Caption="Opcje"/>
+   <OptCorrectErrors Caption="Korekcja bledów" Width="97" left="17"/>
+   <OptVerbose Caption="Rozszezony" Width="137" left="17"/>
+   <doChkDsk Caption="&Sprawdz dysk" Width="85"/>
+   <doAbort Caption="&Przerwij"/>
+   <Button1 Caption="&O programie"/>
+   <doExit Caption="&Wyjscie"/>
+   <Radiogroup1 Caption="Typ testu">
+    <Items>
+     <Item Index="0" Value="Standardowy"/>
+     <Item Index="1" Value="Gruntowny (skan.powierzch.)"/>
+     <Item Index="2" Value="Sprawdz czy uszkodzony"/>
+    </Items>
+   </Radiogroup1>
+   <Variables>
+    <Item Name="Check_Disk_Failed" Value="Niepowodzenie przy sprawdzaniu dysku"/>
+    <Item Name="Error_with_drive" Value="Bledy na dysku: "/>
+    <Item Name="Check_Disk_Found_Problems_with" Value="Check Disk znalazl problemy z: "/>
+    <Item Name="or_check_again" Value="lub spróbuj ponownie"/>
+    <Item Name="Problem_found_with_drive" Value="Znaleziono problemy na dysku"/>
+    <Item Name="More_than_one_drive_must_be_repair" Value="Wiecej niz jeden dysk musi byc naprawiony"/>
+    <Item Name="The_following_drive_must_be_repair" Value="Nastepujacy dysk musi byc naprawiony"/>
+    <Item Name="Restart_the_PC_for_repair" Value="Zrestartuj PC by naprawic."/>	
+    <Item Name="administrator_rights_needed_to_use_this_program" Value="Ostrzezenie - musisz miec uprawnienia administratora do uzywania tego programu'."/>	
+    <Item Name="Diskscan_was_completed" Value="Diskscan zostal zakonczony: Pomyslnie'."/>	
+   <Item Name="This_program_is_freeware_for_privat_and_commercial_use" Value="Ten program jest bezplatny dla uzytku prywatnego jak i komercyjnego'."/>	
+
+	
+	</Variables>
+ </MainForm>
+</Translation>

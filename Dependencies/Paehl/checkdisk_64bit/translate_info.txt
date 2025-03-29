@@ -1,0 +1,9 @@
+Translate info in other language:
+See http://msdn.microsoft.com/en-us/library/dd318693(v=VS.85).aspx
+for your language. sample Germany (DE)
+make in the folder language the subfolder de_DE
+and copy the translate.xml in this folder
+
+Or open the about box and see your subfolder info
+Now send me the new translate file: www.paehl.de 
+

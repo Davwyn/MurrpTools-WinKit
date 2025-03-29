@@ -1,0 +1,373 @@
+﻿# ##############################
+# Language file for WipeFile 3.6
+# ##############################
+
+# Please read the file "!!! Important Notes for Translators !!!.txt" before you
+# create or edit a language file!
+
+# Please enter your name and contact information.
+# These data will be used for list of translations in the credits.
+# If you do not want to provide one of these information, left the field blank.
+# ==============================================================================
+Language.Translator.Name=Werner Rumpeltesz
+Language.Translator.EMail=info@gaijin.at
+Language.Translator.Website=https://www.gaijin.at/
+# ==============================================================================
+
+# The language name in the native language.
+# (E.g. "Français" for French or "Русский" for Russian.
+Language.NativeName=English
+
+# Filename of the help file, if an other help file should be used.
+# Help files must be located in the "Help" folder of the application.
+# Leave it commented out for English help.
+#Language.HelpFile=Help.en.html
+
+# Name and size of the font
+# Leave it commented out for default font.
+#General.Font.Name=Segoe UI
+#General.Font.Size=9
+
+# >>> ADDED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+General.MessageBox.OpenLinkError.Title=Open Link
+General.MessageBox.OpenLinkError.Text=The link to "{0}" can not be open.
+General.MessageBox.HelpError.Title=Help
+General.MessageBox.HelpError.Text=The help file "{0}" can not be open.
+# <<< ADDED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# >>> REMOVED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#General.Msg.Title.NoDefaultMailer=Mail Client not found
+#General.Msg.Text.NoDefaultMailer=The default mail client could not be found.
+#General.Msg.Title.NoDefaultBrowser=Web Browser Not Found
+#General.Msg.Text.NoDefaultBrowser=The default web browser could not be found.
+#General.Msg.Title.NoHelp=Help not available
+#General.Msg.Text.NoHelp=The help file "{0}" can't be opened.
+# <<< REMOVED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+General.Button.Ok=Ok
+General.Button.Cancel=Cancel
+General.Button.Help=Help
+
+General.FileFilter.All=All files (*.*)
+General.FileFilter.Templates=WipeFile templates (*.wft3)
+
+
+
+# ###############################
+# ##   C O N F I G   F O R M   ##
+# ###############################
+
+# >>> REMOVED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#Config.Form.Title=Setup {0}
+
+#Config.grpUserData=User data
+#Config.lblUserDataDesc=The "user data" contains the application settings.
+#Config.rbUserDataAppData=Folder for application data of the current user (recommended)
+#Config.rbUserDataProgram=Application directory of {0} (portable)
+#Config.rbUserDataUserDef=User defined directory:
+
+#Config.Dlg.Folder.UserDef=Please select the folder for the user data.
+# <<< REMOVED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+# #####################################
+# ##   I N I T I A L I Z A T I O N   ##
+# #####################################
+
+# >>> ADDED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Init.MessageBox.Config.Text=Do you want to use {APPNAME} portable?\r\n\r\nSelect "Yes" to save the user data in the program folder (portable).\r\n\r\nSelect "No" to save the user data in the folder for application data of the current user.
+
+Init.MessageBox.InitError.Text=Error while initializing the application.\r\n\r\nMessage:\r\n{0}
+Init.MessageBox.SaveError.Text=Error while saving configuration file "{1}".\r\n\r\nPlease make sure that the disk and file are not write-protected and that you have write permission for the folder and file.\r\n\r\nMessage:\r\n{0}
+Init.MessageBox.LoadError.Text=Error while loading configuration file "{1}".\r\n\r\nMessage:\r\n{0}
+# <<< ADDED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+# #############################
+# ##   A B O U T   F O R M   ##
+# #############################
+
+# >>> ADDED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+About.Form.Title=About {APPNAME}
+
+About.Version=Version {0}
+About.Bit=({0}-bit)
+About.License.ToolTip=Show license information
+
+About.DevelopedBy=Developed by
+
+About.Credits=Contributors (Credits and Acknowledgments)
+About.Credits.ToolTip=View the contributors (credits and acknowledgments)
+
+# Placeholders for "MailLink" and "WebLink" tool-tips: {0} name, {1} link URL.
+About.MailLink.ToolTip=Send an e-mail to {0}
+About.WebLink.ToolTip=Visit the website of {0}
+
+About.Website=Website
+About.Website.ToolTip=Visit the website of {APPNAME}
+About.Feedback=Feedback
+About.Feedback.ToolTip=Send feedback or feature-request
+About.BugReport=Bug Report
+About.BugReport.ToolTip=Report bug or problem
+About.Donate=Donate
+About.Donate.ToolTip=Learn more about donating or other participation
+# <<< ADDED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# >>> REMOVED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#About.Form.Title=About {0}
+
+#About.Version=Version {0}
+#About.Description={0}
+
+#About.Credits=Credits
+#About.Credits.Translation=Translation
+#About.Credits.Icons=Icons
+# <<< REMOVED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+# ###########################
+# ##   M A I N   F O R M   ##
+# ###########################
+
+# >>> REMOVED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#Main.mnuLanguage=Language
+# <<< REMOVED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Main.mnuFile=&File
+Main.mnuFileWipe=&Wipe
+Main.mnuFileTemplateLoad=&Open Template...
+Main.mnuFileTemplateSave=&Save Template...
+Main.mnuFileExit=E&xit
+
+Main.mnuEdit=&Edit
+Main.mnuEditAddFiles=&Add Files...
+Main.mnuEditAddFolder=Add &Folders...
+Main.mnuEditPathRemoveSel=Remove &Selected Paths
+Main.mnuEditPathRemoveAll=Remove A&ll Paths
+Main.mnuEditPathRecursive=&Include Subfolders (Recursive)
+Main.mnuEditPathNotRecursive=&Don't Include Subfolders (Not Recursive)
+Main.mnuEditMaskEdit=&Edit File Mask
+
+Main.mnuView=&View
+Main.mnuViewTopMost=Show Window on &Top
+# >>> ADDED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Main.mnuViewToolbars=Tool&bars
+Main.mnuViewToolbarsMain=&Main Toolbar
+# <<< ADDED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Main.mnuExtras=E&xtras
+Main.mnuExtrasSettings=&Settings...
+
+Main.mnuHelp=&Help
+Main.mnuHelpHelp=&Help
+# >>> CHANGED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Main.mnuHelpWebsite={APPNAME} &Website
+Main.mnuHelpEMail=Send &Feedback
+# >>> ADDED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Main.mnuHelpBugReport=Report a &Bug
+# <<< ADDED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+Main.mnuHelpDonate=&Donate
+Main.mnuHelpAbout=&About {APPNAME}...
+# <<< CHANGED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# >>> ADDED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Main.Toolbars.TextShow=Show Title for "{0}"
+Main.Toolbars.TextHide=Hide Title for "{0}"
+Main.Toolbars.Multiline=Multi-line Toolbar
+# <<< ADDED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Main.colDirectory=Folder
+Main.colFileMask=File Mask
+Main.colRecursive=Recursive
+
+Main.lvPathMask.Recursiv.Yes=Yes
+Main.lvPathMask.Recursiv.No=No
+
+Main.grpOptions=Options
+Main.lblWipeMethod=Wipe method:
+# >>> CHANGED 3.6 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Main.chkCloseAfterWipe=Close WipeFile after wiping
+# <<< CHANGED 3.4 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Main.lblProgressTitle.Search=Search files...
+Main.lblProgressTitle.Wipe=Wipe files...
+Main.lblProgressTitle.Done=Done
+
+Main.lblProgressTotalTitle=Total progress:
+Main.lblProgressTotalInfo={0} out of {1} files ({2} out of {3})
+
+Main.lblProgressFileTitle=Current file:
+Main.lblProgressFileInfo=Step {0} out of {1} ({2} out of {3})
+
+Main.btnWipe=Wipe
+Main.btnAbort=Abort
+Main.btnExit=Exit
+
+# >>> ADDED 3.6 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Main.Msg.PathRemoveSel.Title=Remove Selected Paths
+Main.Msg.PathRemoveSel.Text=Do you want to remove the selected paths from the processing list?
+Main.Msg.PathRemoveAll.Title=Remove All Paths
+Main.Msg.PathRemoveAll.Text=Do you want to remove all paths from the processing list?
+# <<< ADDED 3.6 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Main.Msg.WipeStartQuery.Title=Wipe files
+Main.Msg.WipeStartQuery.Text={0} files with {1} have been found.\r\n\r\nDo you want to overwrite and delete these files?
+Main.Msg.WipeProgressSuccess.Title=Wiping successfully
+Main.Msg.WipeProgressSuccess.Text=All selected files have been completely overwritten and removed.
+Main.Msg.WipeProgressError.Title=Error while wiping
+Main.Msg.WipeProgressError.Text=Not all files may have been completely overwritten or removed.
+Main.Msg.WipeProgressAbort.Title=Aborted by user
+Main.Msg.WipeProgressAbort.Text=The overwriting and deleting of the files have been aborted.
+Main.Msg.WipeAbortQuery.Title=Abort
+Main.Msg.WipeAbortQuery.Text=Should the overwriting and deleting of the files be aborted?
+
+Main.Msg.Logging.FolderCreateError.Title=Logging failed
+Main.Msg.Logging.FolderCreateError.Text=The output folder for the log files could not be created.\r\n\r\nPlease check the settings or create the folder manually.
+Main.Msg.Logging.FileCreateError.Title=Logging failed
+Main.Msg.Logging.FileCreateError.Text=The log file could not be created.
+
+Main.Dlg.AddFiles.Title=Add files
+Main.Dlg.TemplateLoad.Title=Open WipeFile template
+Main.Dlg.TemplateSave.Title=Save WipeFile template
+
+Main.Msg.TemplateLoadReplace.Title=Open template
+Main.Msg.TemplateLoadReplace.Text=The processing list already contains paths.\r\nShould the existing entries be replaced?
+Main.Msg.TemplateLoadError.Title=Open template
+Main.Msg.TemplateLoadError.Text=The template file could not be open.
+Main.Msg.TemplateSaveError.Title=Save template
+Main.Msg.TemplateSaveError.Text=The template file could not be saved.
+
+# === WIPE METHODS =============================================================
+
+Main.cmbWipeMethod.WipeFileSimple=WipeFile - Simple (1x)
+Main.ttWipeMethod.WipeFileSimple.Title=WipeFile - Simple
+Main.ttWipeMethod.WipeFileSimple.Text=The file content will be overwritten once with a predefined text.
+
+Main.cmbWipeMethod.Zero=Zero (1x)
+Main.ttWipeMethod.Zero.Title=Zero
+Main.ttWipeMethod.Zero.Text=The file content will be overwritten once with 0x00.
+
+Main.cmbWipeMethod.Random=Random (1x)
+Main.ttWipeMethod.Random.Title=Random
+Main.ttWipeMethod.Random.Text=The file content will be overwritten once with random characters.
+
+Main.cmbWipeMethod.WipeFileMedium=WipeFile - Medium (2x)
+Main.ttWipeMethod.WipeFileMedium.Title=WipeFile - Medium
+Main.ttWipeMethod.WipeFileMedium.Text=The file content will be overwritten with 0x00 and afterwards with a predefined text.
+
+Main.cmbWipeMethod.RandomZero=Random & Zero (2x)
+Main.ttWipeMethod.RandomZero.Title=Random & Zero
+Main.ttWipeMethod.RandomZero.Text=The file content will be overwritten with random characters and afterwards with 0x00.
+
+Main.cmbWipeMethod.ZeroRandom=Zero & Random (2x)
+Main.ttWipeMethod.ZeroRandom.Title=Zero & Random
+Main.ttWipeMethod.ZeroRandom.Text=The file content will be overwritten with 0x00 and afterwards with random characters.
+
+Main.cmbWipeMethod.MSCipher=Microsoft Cipher (3x)
+Main.ttWipeMethod.MSCipher.Title=Microsoft Cipher
+Main.ttWipeMethod.MSCipher.Text=The file content will be overwritten with 0x00, 0x80 and 0xFF.\r\nThis corresponds to the wipe method of the console command "cipher /W" in Microsoft Windows.
+
+Main.cmbWipeMethod.NAVSO_MFM=US Navy - MFM (3x)
+Main.ttWipeMethod.NAVSO_MFM.Title=US Navy - MFM
+Main.ttWipeMethod.NAVSO_MFM.Text=The file content will be overwritten with 0xFF, 0xBF 0xFF 0xFF 0xFF and random characters.\r\nThis corresponds to US Navy standard "NAVSO P-5239-26 - MFM".
+
+Main.cmbWipeMethod.NAVSO_RLL=US Navy - RLL (3x)
+Main.ttWipeMethod.NAVSO_RLL.Title=US Navy - RLL
+Main.ttWipeMethod.NAVSO_RLL.Text=The file content will be overwritten with 0xFF, 0x27 0xFF 0xFF 0xFF and random characters.\r\nThis corresponds to US Navy standard "NAVSO P-5239-26 - RLL".
+
+Main.cmbWipeMethod.DoD_USAF=US DoD / US Air Force (3x)
+Main.ttWipeMethod.DoD_USAF.Title=US Department of Defense / US Air Force
+Main.ttWipeMethod.DoD_USAF.Text=The file content will be overwritten with 0x00, 0xFF and random characters.\r\nThis corresponds to US Department of Defense standard "DoD 5220.22-M" and US Air Force standard "AFSSI5020".
+
+Main.cmbWipeMethod.WipeFileSecure=WipeFile - Secure (4x)
+Main.ttWipeMethod.WipeFileSecure.Title=WipeFile - Secure
+Main.ttWipeMethod.WipeFileSecure.Text=The file content will be overwritten with 0x00, 0x80 and 0xFF. Afterwards with a predefined text.
+
+Main.cmbWipeMethod.BitToggle=Bit Toggle (4x)
+Main.ttWipeMethod.BitToggle.Title=Bit Toggle
+Main.ttWipeMethod.BitToggle.Text=The file content will be overwritten twice, each with 0x00 and 0xFF.
+
+Main.cmbWipeMethod.NATO=NATO Standard (7x)
+Main.ttWipeMethod.NATO.Title=NATO Standard
+Main.ttWipeMethod.NATO.Text=The file content will be overwritten three times, each with 0x00 and 0xFF. Afterwards with random characters.\r\nThis corresponds to the standard of the North Atlantic Treaty Organization (NATO).
+
+Main.cmbWipeMethod.PeterGutmann=Peter Gutmann (35x)
+Main.ttWipeMethod.PeterGutmann.Title=Peter Gutmann
+Main.ttWipeMethod.PeterGutmann.Text=The file content will be overwritten 35 times with random and predefined data.
+
+
+
+# #####################################
+# ##   E D I T   M A S K   F O R M   ##
+# #####################################
+
+MaskEdit.Form.Title=Edit File Mask
+
+MaskEdit.lblMessage=Current folder:\r\n{0}
+MaskEdit.lblMask=New file mask:
+
+MaskEdit.Msg.InvalidMask.Title=Invalid file mask
+MaskEdit.Msg.InvalidMask.Text=The file mask contains invalid characters.\r\n\r\nThe following characters are not allowed in a file mask:\r\n{0}
+
+
+
+# ###################################
+# ##   S E T T I N G S   F O R M   ##
+# ###################################
+
+Settings.Form.Title=Settings
+
+Settings.tabGeneral=General
+# >>> ADDED 3.5 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Settings.Label.Language=Language
+# <<< ADDED 3.5 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+Settings.chkShowGridLines=Show grid lines in processing list
+Settings.chkColumnsAutoSize=Size columns automatically
+# >>> ADDED 3.6 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Settings.chkConfirmPathRemove=Confirm removal of paths from processing list
+# <<< ADDED 3.6 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+Settings.chkRemoveWipedPaths=Remove successfully wiped paths from processing list
+Settings.chkAskBeforeWipe=Confirm wiping
+Settings.chkShowMessageAfterWipe=Show notification message after wiping
+# >>> ADDED 3.3 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Settings.lblWipeFinishSound=Play notification sound after wiping:
+Settings.cmbWipeFinishSound.None=Play no sound
+Settings.cmbWipeFinishSound.Intern1=Advisory sound 1
+Settings.cmbWipeFinishSound.Intern2=Advisory sound 2
+Settings.cmbWipeFinishSound.Intern3=Advisory sound 3
+
+Settings.tabWipe=Wiping
+# <<< ADDED 3.3 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# >>> ADDED 3.4 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Settings.lblWipeString=Overwrite data with text:
+Settings.lblWipeDateTime=Change file times to:
+Settings.chkWipeDateTimeRandom=Random date/time
+Settings.lblUTC=UTC
+# <<< ADDED 3.4 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Settings.tabLogging=Logging
+Settings.lblLoggingType=Logging type:
+Settings.cmbLoggingType.None=No logging
+Settings.cmbLoggingType.Errors=Errors only
+Settings.cmbLoggingType.All=All files
+
+Settings.lblLoggingFolder=Folder for log files:
+
+Settings.tabIntegrate=Explorer Integration
+Settings.chkIntegrateContextUser=Integrate into the context menu
+Settings.chkIntegrateSendTo=Integrate into the "Send to" menu
+Settings.btnIntegrateStartMenu=Create a Start menu link
+
+Settings.Dlg.Folder.LoggingFolder=Please select the folder for the log files.
+
+Settings.Msg.Integration.Title=Explorer Integration
+Settings.Msg.IntegrationError.Text=An error occurred while changing the Explorer integration settings.
+Settings.Msg.IntegrationStartMenuError.Text=The Start menu link can't be created.
+Settings.Msg.IntegrationStartMenuSuccess.Text=The Start menu link has been successfully created.
+# >>> ADDED 3.3 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Settings.Integrate.Context.Text=Wipe with {0}
+# <<< ADDED 3.3 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

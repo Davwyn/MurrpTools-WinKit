@@ -1,0 +1,34 @@
+<Translation>
+ <MainForm>
+   <Label1 Caption="Situación actual:"/>
+   <Label3 Caption="Opciones"/>
+   <OptCorrectErrors Caption="Corregir errores" Width="97" left="17"/>
+   <OptVerbose Caption="verbose" Width="137" left="17"/>
+   <doChkDsk Caption="&Comprobar disco" Width="85"/>
+   <doAbort Caption="&Abortar"/>
+   <Button1 Caption="&Sobre..."/>
+   <doExit Caption="&Salir"/>
+   <Radiogroup1 Caption="Tipo de test">
+    <Items>
+     <Item Index="0" Value="Standard"/>
+     <Item Index="1" Value="Completo(analiza superficie)"/>
+     <Item Index="2" Value="Comprobar suciedad"/>
+    </Items>
+   </Radiogroup1>
+   <Variables>
+    <Item Name="Check_Disk_Failed" Value="Fallo de Check Disk"/>
+    <Item Name="Error_with_drive" Value="Error en el disco: "/>
+    <Item Name="Check_Disk_Found_Problems_with" Value="Check Disk encontró problemas en: "/>
+    <Item Name="or_check_again" Value="o probar de nuevo"/>
+    <Item Name="Problem_found_with_drive" Value="Problemas hallados en disco"/>
+    <Item Name="More_than_one_drive_must_be_repair" Value="Debe repararse más de un disco"/>
+    <Item Name="The_following_drive_must_be_repair" Value="Debe repararse el siguiente disco:"/>
+    <Item Name="Restart_the_PC_for_repair" Value="Reiniciar el PC para reparación."/>	
+    <Item Name="administrator_rights_needed_to_use_this_program" Value="Advertencia: Necesita derechos de administrador para usar este programa'."/>	
+    <Item Name="Diskscan_was_completed" Value="Se completó la revisión del disco: Exitosamente'."/>	
+   <Item Name="This_program_is_freeware_for_privat_and_commercial_use" Value="Este programa es freeware para uso privado y comercial'."/>	
+
+	
+	</Variables>
+ </MainForm>
+</Translation>

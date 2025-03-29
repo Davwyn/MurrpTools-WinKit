@@ -1,0 +1,13 @@
+\Windows\System32\XpsGdiConverter.dll
+\Windows\System32\XpsRasterService.dll
+\Windows\System32\XpsDocumentTargetPrint.dll
+\Windows\System32\XpsPrint.dll
+\Windows\System32\xpsservices.dll
+
+\Windows\SysWOW64\XpsDocumentTargetPrint.dll
+\Windows\SysWOW64\XpsGdiConverter.dll
+\Windows\SysWOW64\XpsRasterService.dll
+\Windows\SysWOW64\XpsPrint.dll
+\Windows\SysWOW64\xpsservices.dll
+
+\ProgramData\Microsoft\Windows\Start Menu\Programs\XPS Viewer.lnk

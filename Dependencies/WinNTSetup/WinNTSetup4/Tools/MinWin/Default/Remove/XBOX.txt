@@ -1,0 +1,16 @@
+\Windows\System32\XblGameSaveTask.exe
+\Windows\System32\XblGameSaveProxy.dll
+\Windows\System32\XblGameSaveExt.dll
+\Windows\System32\xboxgipsynthetic.dll
+\Windows\System32\XblAuthManagerProxy.dll
+\Windows\System32\XblAuthTokenBrokerExt.dll
+\Windows\System32\XboxGipRadioManager.dll
+\Windows\System32\xboxgipsvc.dll
+\Windows\System32\XblAuthManager.dll
+\Windows\System32\XboxNetApiSvc.dll
+\Windows\System32\XblGameSave.dll
+
+\Windows\SysWOW64\XblGameSaveProxy.dll
+\Windows\SysWOW64\XblAuthManagerProxy.dll
+\Windows\SysWOW64\XblAuthTokenBrokerExt.dll
+\Windows\SysWOW64\xboxgipsynthetic.dll

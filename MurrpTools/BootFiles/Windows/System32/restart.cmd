@@ -1,0 +1,2 @@
+wpeutil reboot
+exit

@@ -1,0 +1,8 @@
+\Windows\Cursors
+\Windows\ehome
+\Windows\Media
+!\Windows\Media\Windows Background.wav
+!\Windows\Media\Windows Foreground.wav
+
+\Windows\Web
+!\Windows\Web\Wallpaper\Windows\img0.jpg

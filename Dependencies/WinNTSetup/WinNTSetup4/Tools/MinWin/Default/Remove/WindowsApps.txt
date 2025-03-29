@@ -1,0 +1,17 @@
+\Program Files\WindowsApps\Microsoft*
+!\Program Files\WindowsApps\Microsoft.VCLibs.*
+
+\Windows\SystemApps
+!\Windows\SystemApps\Microsoft.UI.Xaml.*
+!\Windows\SystemApps\MicrosoftWindows.Client.*
+!\Windows\SystemApps\Microsoft.Windows.StartMenuExperienceHost_*
+
+\Program Files\WindowsApps\DeletedAllUserPackages
+\Program Files\WindowsApps\NVIDIACorp.*
+\Program Files\WindowsApps\RealtekSemiconductorCorp.*
+
+!\Windows\SystemApps\Microsoft.AccountsControl_*
+!\Windows\SystemApps\Microsoft.BioEnrollment_*
+!\Windows\SystemApps\microsoft.creddialoghost_*
+!\Windows\SystemApps\Microsoft.LockApp_*
+!\Windows\SystemApps\Microsoft.Win32WebViewHost_*

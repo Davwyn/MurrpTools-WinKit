@@ -1,0 +1,33 @@
+<Translation>
+ <MainForm>
+   <Label1 Caption="Aktueller Status:"/>
+   <Label3 Caption="Optionen"/>
+   <OptCorrectErrors Caption="Fehler beheben" Width="97" left="17"/>
+   <OptVerbose Caption="Ausführliche Meldungen" Width="137" left="17"/>
+   <doChkDsk Caption="&Prüfe Laufwerk" Width="85"/>
+   <doAbort Caption="&Abbruch"/>
+   <Button1 Caption="&Über"/>
+   <doExit Caption="&Beenden"/>
+   <Radiogroup1 Caption="Testart">
+    <Items>
+     <Item Index="0" Value="Standard"/>
+     <Item Index="1" Value="Ausführlich"/>
+     <Item Index="2" Value="Prüfe auf Dirty bit"/>
+    </Items>
+   </Radiogroup1>
+   <Variables>
+    <Item Name="Check_Disk_Failed" Value="Laufwerk kann nicht überprüft werden, wiederholen"/>
+    <Item Name="Error_with_drive" Value="Fehler mit Laufwerk: "/>
+    <Item Name="Check_Disk_Found_Problems_with" Value="Problem gefunden mit Laufwerk: "/>
+    <Item Name="or_check_again" Value="oder wiederhole die Prüfung"/>
+    <Item Name="Problem_found_with_drive" Value="Problem gefunden mit Laufwerk"/>
+    <Item Name="More_than_one_drive_must_be_repair" Value="Mehr als Laufwerk muß repariert werden"/>
+    <Item Name="The_following_drive_must_be_repair" Value="Folgende Laufwerke müßen reapiert werden"/>
+    <Item Name="Restart_the_PC_for_repair" Value="Zum reparieren muß der PC neu gestartet werden."/>
+    <Item Name="administrator_rights_needed_to_use_this_program" Value="Achtung- es werden Administrator Rechte benötigt."/>
+    <Item Name="Diskscan_was_completed" Value="Prima, es wurden keine Probleme gefunden.'."/>	
+    <Item Name="This_program_is_freeware_for_privat_and_commercial_use" Value="Dieses Programm ist kostenlos für alle"/>	
+	
+	</Variables>
+ </MainForm>
+</Translation>

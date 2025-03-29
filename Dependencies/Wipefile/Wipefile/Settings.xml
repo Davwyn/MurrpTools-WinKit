@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+  <General>
+    <Language>English</Language>
+    <ShowGridLines>1</ShowGridLines>
+    <ColumnsAutoSize>1</ColumnsAutoSize>
+    <ConfirmPathRemove>1</ConfirmPathRemove>
+    <LastSortColumn>0</LastSortColumn>
+    <LastSortOrder>1</LastSortOrder>
+    <RemoveWipedPaths>1</RemoveWipedPaths>
+    <AskBeforeWipe>1</AskBeforeWipe>
+    <ShowMessageAfterWipe>1</ShowMessageAfterWipe>
+    <WipeFinishSound>0</WipeFinishSound>
+    <CloseAfterWipe>1</CloseAfterWipe>
+  </General>
+  <Window>
+    <State>0</State>
+    <Left>10</Left>
+    <Top>10</Top>
+    <Width>650</Width>
+    <Height>500</Height>
+    <TopMost>0</TopMost>
+    <MenuMainMultiLine>0</MenuMainMultiLine>
+    <ToolbarMainVisible>1</ToolbarMainVisible>
+    <ToolbarMainMultiLine>0</ToolbarMainMultiLine>
+    <ToolbarMainImageText />
+  </Window>
+  <Wipe>
+    <LastMethod>4</LastMethod>
+    <String>DeletedWipeFile</String>
+    <DateTime>630822816000000000</DateTime>
+    <DateTimeRandom>0</DateTimeRandom>
+  </Wipe>
+  <Logging>
+    <Type>1</Type>
+    <Folder></Folder>
+  </Logging>
+</Settings>

@@ -1,0 +1,9 @@
+\Windows\System32\updateagent.dll
+\Windows\System32\wuapi.dll
+\Windows\System32\wuapihost.exe
+\Windows\System32\wuauclt.exe
+\Windows\System32\wuaueng.dll
+\Windows\System32\wucltux.dll
+\Windows\System32\WindowsAnytimeUpgrade.exe
+\Windows\System32\WindowsAnytimeUpgradeResults.exe
+\Windows\System32\WindowsAnytimeUpgradeui.exe

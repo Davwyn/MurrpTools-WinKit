@@ -1,0 +1,29 @@
+[
+  {
+    "Name": "Davwyn's Debloater",
+    "URL": "https://github.com/Dav-Edward/DavwynsDebloater/raw/refs/heads/main/Davwyn_Debloat.ps1",
+    "Website": "https://github.com/Dav-Edward/DavwynsDebloater",
+    "Author": "Davwyn",
+    "Description": "Debloat tool built by Davwyn designed specifically to work with MurrpTools to clean unwanted bloat from Windows 10 and Windows 11 before or after Windows starts for the first time.",
+    "Filename": "Davwyn_Debloat.ps1",
+    "OOBESupported": true
+  },
+  {
+    "Name": "Chris Titus Tech's Windows Utility",
+    "URL": "https://christitus.com/win",
+    "Website": "https://github.com/ChrisTitusTech/winutil",
+    "Author": "Chris Titus",
+    "Description": "A powerful Windows Utility by Chris Titus designed to streamline Windows Installs, Debloat with Teats, Troubleshoot, and fix Windows Updates.",
+    "Filename": "ChrisTitusTech.ps1",
+    "OOBESupported": false
+  },
+  {
+    "Name": "Memory's Winhance Windows Enhancement Utility",
+    "URL": "https://github.com/memstechtips/Winhance/raw/main/Winhance.ps1",
+    "Website": "https://github.com/memstechtips/Winhance",
+    "Author": "Memory",
+    "Description": "A Windows Debloat utility by Youtuber Memory designed to clean bloat out of Windows and attempt to keep it out.",
+    "Filename": "Winhance.ps1",
+    "OOBESupported": false
+  }
+]

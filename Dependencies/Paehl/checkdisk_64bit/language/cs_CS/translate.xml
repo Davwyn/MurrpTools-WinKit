@@ -1,0 +1,33 @@
+<Translation>
+ <MainForm>
+   <Label1 Caption="Aktuální stav:"/>
+   <Label3 Caption="Možnosti"/>
+   <OptCorrectErrors Caption="Opravit chyby" Width="97" left="17"/>
+   <OptVerbose Caption="Podrobný" Width="137" left="17"/>
+   <doChkDsk Caption="&Kontrola disku" Width="85"/>
+   <doAbort Caption="&Pøerušit"/>
+   <Button1 Caption="&O programu"/>
+   <doExit Caption="&Konec"/>
+   <Radiogroup1 Caption="Typ kontroly">
+    <Items>
+     <Item Index="0" Value="Standardní"/>
+     <Item Index="1" Value="Dùkladný (vèetnì plošného skenu)"/>
+     <Item Index="2" Value="Kontrola zneèištìní"/>
+    </Items>
+   </Radiogroup1>
+   <Variables>
+    <Item Name="Check_Disk_Failed" Value="Kontrola disku se nezdaøila"/>
+    <Item Name="Error_with_drive" Value="Chyba na disku: "/>
+    <Item Name="Check_Disk_Found_Problems_with" Value="Check Disk nalezl problém: "/>
+    <Item Name="or_check_again" Value="nebo zopakujte"/>
+    <Item Name="Problem_found_with_drive" Value="Problém nalezen na disku"/>
+    <Item Name="More_than_one_drive_must_be_repair" Value="Více než jeden disk je potøeba opravit"/>
+    <Item Name="The_following_drive_must_be_repair" Value="Nasledující disk je nutno opravit"/>
+    <Item Name="Restart_the_PC_for_repair" Value="Restartovat PC pro opravu."/>	
+    <Item Name="administrator_rights_needed_to_use_this_program" Value="Pozor - pro použití tohoto programu jsou nutná práva Administrátora'."/>	
+    <Item Name="Diskscan_was_completed" Value="Sken disku byl dokonèen: Úspìšnì'."/>	
+   <Item Name="This_program_is_freeware_for_privat_and_commercial_use" Value="Tento program je poskytnut BEZPLATNÌ pro soukromé i komerèní použití'."/>
+	
+	</Variables>
+ </MainForm>
+</Translation>

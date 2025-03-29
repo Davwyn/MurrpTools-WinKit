@@ -1,0 +1,2 @@
+\Windows\Performance
+\Windows\System32\WinSAT.exe

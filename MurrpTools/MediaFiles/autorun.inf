@@ -1,0 +1,7 @@
+[AutoRun.Amd64]
+open=setup.exe
+icon=Derg.ico
+
+[AutoRun]
+open=sources\SetupError.exe x64
+icon=sources\SetupError.exe,0

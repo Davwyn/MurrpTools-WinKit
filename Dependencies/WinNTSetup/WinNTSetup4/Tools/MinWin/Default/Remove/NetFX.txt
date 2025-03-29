@@ -1,0 +1,69 @@
+\Program Files\Reference Assemblies
+\Program Files\MSBuild
+\Program Files (x86)\Microsoft.NET
+\Program Files (x86)\MSBuild
+\Program Files (x86)\Reference Assemblies
+\Windows\assembly
+\Windows\INF\.NET CLR Data
+\Windows\INF\.NET CLR Networking
+\Windows\INF\.NET CLR Networking 4.0.0.0
+\Windows\INF\.NET Data Provider for Oracle
+\Windows\INF\.NET Data Provider for SqlServer
+\Windows\INF\.NET Memory Cache 4.0
+\Windows\INF\.NETFramework
+\Windows\Microsoft.NET
+
+\Program Files\dotnet
+\Program Files (x86)\dotnet
+
+\Windows\SysWOW64\mscoree.dll
+\Windows\SysWOW64\mscorier.dll
+\Windows\SysWOW64\mscories.dll
+
+
+
+;\Windows\System32\mscoree.dll
+;\Windows\System32\mscorier.dll
+;\Windows\System32\mscories.dll
+
+!\Windows\Microsoft.NET\Framework64\v4.0.30319\clr.dll
+!\Windows\Microsoft.NET\Framework64\v4.0.30319\clrjit.dll
+!\Windows\Microsoft.NET\Framework64\v4.0.30319\mscorrc.dll
+!\Windows\Microsoft.NET\Framework64\v4.0.30319\diasymreader.dll
+!\Windows\Microsoft.NET\Framework64\v4.0.30319\mscoreei.dll
+!\Windows\Microsoft.NET\Framework64\v4.0.30319\fusion.localgac
+!\Windows\Microsoft.NET\Framework64\v4.0.30319\config\machine.config
+
+!\Windows\assembly\GAC_MSIL\Microsoft.ManagementConsole\*
+!\Windows\assembly\GAC_MSIL\MMCEx\*
+!\Windows\assembly\GAC_MSIL\MMCEx.Resources\*
+!\Windows\assembly\GAC_MSIL\MMCFxCommon\*
+
+!\Windows\Microsoft.NET\assembly\GAC_64\mscorlib\*
+
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.ManagementConsole\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\MMCEx\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\MMCEx.Resources\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\MMCFxCommon\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\System\*
+
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\Accessibility\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Core\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Configuration\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Data.SqlXml\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Deployment\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Drawing\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Numerics\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Runtime.Serialization.Formatters.Soap\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Security\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Xml\*
+
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\TaskScheduler\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\TaskScheduler.Resources\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\EventViewer\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\EventViewer.Resources\*
+!\Windows\Microsoft.Net\assembly\GAC_MSIL\MiguiControls\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\MiguiControls.Resources\*
+!\Windows\Microsoft.NET\assembly\GAC_MSIL\System.ServiceProcess\*
+

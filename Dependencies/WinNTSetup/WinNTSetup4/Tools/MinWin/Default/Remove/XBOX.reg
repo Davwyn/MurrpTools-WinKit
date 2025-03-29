@@ -1,0 +1,7 @@
+Windows Registry Editor Version 5.00
+
+[-HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\XblAuthManager]
+[-HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\XblGameSave]
+[-HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\xboxgip]
+[-HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\XboxGipSvc]
+[-HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\XboxNetApiSvc]

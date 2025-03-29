@@ -1,0 +1,34 @@
+<Translation>
+ <MainForm>
+   <Label1 Caption="Status:"/>
+   <Label3 Caption="Valg"/>
+   <OptCorrectErrors Caption="Korrigér feil" Width="97" left="17"/>
+   <OptVerbose Caption="Detaljert rapportering" Width="137" left="17"/>
+   <doChkDsk Caption="&Sjekk disk" Width="85"/>
+   <doAbort Caption="&Avbryt"/>
+   <Button1 Caption="&Om"/>
+   <doExit Caption="&Avslutt"/>
+   <Radiogroup1 Caption="Testtype">
+    <Items>
+     <Item Index="0" Value="Standard"/>
+     <Item Index="1" Value="Grundig (inkl. overflate-scan)"/>
+     <Item Index="2" Value="Sjekk for smuss"/>
+    </Items>
+   </Radiogroup1>
+   <Variables>
+    <Item Name="Check_Disk_Failed" Value="Check Disk feilet"/>
+    <Item Name="Error_with_drive" Value="Feil med disk: "/>
+    <Item Name="Check_Disk_Found_Problems_with" Value="Check Disk fant problemer med: "/>
+    <Item Name="or_check_again" Value="eller prøv igjen"/>
+    <Item Name="Problem_found_with_drive" Value="Problem funnet med disk"/>
+    <Item Name="More_than_one_drive_must_be_repair" Value="Mer enn én disk må repareres"/>
+    <Item Name="The_following_drive_must_be_repair" Value="Følgende disk må repareres"/>
+    <Item Name="Restart_the_PC_for_repair" Value="Start PC-en på nytt for reparasjonen."/>	
+    <Item Name="administrator_rights_needed_to_use_this_program" Value="Advarsel - administrator-rettigheter kreves for å kjøre dette programmet."/>	
+    <Item Name="Diskscan_was_completed" Value="Disk-scan ble fullført med suksess."/>	
+   <Item Name="This_program_is_freeware_for_privat_and_commercial_use" Value="Dette programmet er gratis for privat og kommersielt bruk."/>	
+
+	
+	</Variables>
+ </MainForm>
+</Translation>

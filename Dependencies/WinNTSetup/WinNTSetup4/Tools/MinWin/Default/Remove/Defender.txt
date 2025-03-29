@@ -1,0 +1,13 @@
+\ProgramData\Microsoft\Windows Defender
+\Program Files\Windows Defender
+\Program Files\Windows Defender Advanced Threat Protection
+\Program Files (x86)\Windows Defender
+
+\Windows\System32\smartscreen.exe
+\Windows\System32\smartscreenps.dll
+\Windows\System32\SecurityHealthHost.exe
+\Windows\System32\SecurityHealthProxyStub.dll
+\Windows\System32\SecurityHealthSystray.exe
+\Windows\System32\SecurityHealthAgent.dll
+\Windows\System32\SecurityHealthSSO.dll
+\Windows\System32\SecurityHealthService.exe

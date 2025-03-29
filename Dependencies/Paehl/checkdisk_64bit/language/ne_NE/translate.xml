@@ -1,0 +1,34 @@
+﻿<Translation>
+ <MainForm>
+   <Label1 Caption="Huidige Status:"/>
+   <Label3 Caption="                 Instellingen"/>
+   <OptCorrectErrors Caption="Corrigeer fouten" Width="97" left="17"/>
+   <OptVerbose Caption="Uitgebreid" Width="137" left="17"/>
+   <doChkDsk Caption="&Controleer Schijf" Width="87"/>
+   <doAbort Caption="&Afbreken"/>
+   <Button1 Caption="&Over..."/>
+   <doExit Caption="&Afsluiten"/>
+   <Radiogroup1 Caption="Type Test">
+    <Items>
+     <Item Index="0" Value="Standaard"/>
+     <Item Index="1" Value="Grondig (incl oppervlakte Scan)"/>
+     <Item Index="2" Value="Controleer op vuil"/>
+    </Items>
+   </Radiogroup1>
+   <Variables>
+    <Item Name="Check_Disk_Failed" Value="Schijf-Controle-Mislukt"/>
+    <Item Name="Error_with_drive" Value="Fout-met-Schijf: "/>
+    <Item Name="Check_Disk_Found_Problems_with" Value="CheckDisk vond problemen met: "/>
+    <Item Name="or_check_again" Value="of controleer opnieuw"/>
+    <Item Name="Problem_found_with_drive" Value="Probleem gevonden met Schijf"/>
+    <Item Name="More_than_one_drive_must_be_repair" Value="Meer dan één schijf moet gerepareerd worden"/>
+    <Item Name="The_following_drive_must_be_repair" Value="De volgende Schijf moet gerepareerd worden"/>
+    <Item Name="Restart_the_PC_for_repair" Value="Herstart de Pc voor reparatie."/>	
+    <Item Name="administrator_rights_needed_to_use_this_program" Value="Waarschuwing - Administrator rechten nodig om dit programma te gebruiken'."/>	
+    <Item Name="Diskscan_was_completed" Value="Schijf Scan is voltooid: succesvol'."/>	
+    <Item Name="This_program_is_freeware_for_privat_and_commercial_use" Value="Dit programma is FreeWare voor Privé en Commercieel gebruik'."/>	
+
+	
+	</Variables>
+ </MainForm>
+</Translation>

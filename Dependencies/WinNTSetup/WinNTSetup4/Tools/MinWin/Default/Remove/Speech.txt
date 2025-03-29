@@ -1,0 +1,4 @@
+\Windows\Speech
+\Windows\Speech_OneCore
+\Windows\System32\Speech
+\Windows\System32\Speech_OneCore

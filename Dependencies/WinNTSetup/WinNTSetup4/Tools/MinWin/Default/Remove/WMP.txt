@@ -1,0 +1,37 @@
+\Program Files\Windows Media Player
+\Program Files (x86)\Windows Media Player
+
+\Windows\System32\msmpeg2vdec.dll
+\Windows\System32\msvidctl.dll
+\Windows\System32\WMASF.DLL
+\Windows\System32\WMADMOD.DLL
+\Windows\System32\WMADMOE.DLL
+\Windows\System32\WmpDui.dll
+\Windows\System32\wmploc.DLL
+\Windows\System32\wmpdxm.dll
+\Windows\System32\wmpeffects.dll
+\Windows\System32\WMPhoto.dll
+\Windows\System32\wmpshell.dll
+\Windows\System32\wmpps.dll
+\Windows\System32\WMNetMgr.dll
+\Windows\System32\WMPDMC.exe
+\Windows\System32\wmp.dll
+\Windows\System32\WMVSDECD.DLL
+\Windows\System32\WMSPDMOD.DLL
+\Windows\System32\WMVSENCD.DLL
+\Windows\System32\wmvdspa.dll
+\Windows\System32\WMSPDMOE.DLL
+\Windows\System32\WMVXENCD.DLL
+\Windows\System32\WMVCORE.DLL
+\Windows\System32\WMVDECOD.DLL
+\Windows\System32\WMVENCOD.DLL
+
+\Windows\SysWOW64\WMPhoto.dll
+\Windows\SysWOW64\WMSPDMOD.DLL
+
+\Users\Public\Music\Sample Music
+\Users\Public\Videos\Sample Videos
+\Users\Public\Pictures\Sample Pictures
+
+
+\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Media Player.lnk
