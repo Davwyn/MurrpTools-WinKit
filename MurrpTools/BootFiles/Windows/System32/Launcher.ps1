@@ -57,7 +57,7 @@ if ($QuickLaunch) {
 $StartMenu = Get-ChildItem -Path "X:\Windows\System32\config\systemprofile\AppData\Roaming\Microsoft\Windows\Start Menu" -Filter *.lnk
 
 # Reorder specific items to the top if they exist
-$priorityOrder = @("Install Windows with Debloat.lnk", "Generic Windows Setup.lnk", "PowerShell.lnk", "Explorer++.lnk", "Restart Computer.lnk")
+$priorityOrder = @("Install Windows with MurrpTools.lnk", "Install Windows without tools.lnk", "PowerShell.lnk", "Explorer++.lnk", "Restart Computer.lnk")
 $QuickLaunch = @(
     $priorityOrder | ForEach-Object {
         $priorityItem = $_
