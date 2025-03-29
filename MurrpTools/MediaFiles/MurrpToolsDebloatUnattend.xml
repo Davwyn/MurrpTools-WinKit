@@ -204,31 +204,11 @@ $scripts = @(
 	}
 } *&gt;&amp;1 &gt;&gt; "C:\Windows\Setup\Scripts\Specialize.log";
 		</File>
-		<File path="C:\Windows\Setup\Scripts\UserOnce.ps1">
-$scripts = @(
-	{
-		[System.Diagnostics.EventLog]::WriteEntry( 'UnattendGenerator', "User '$env:USERNAME' has requested to unlock the Start menu layout.", [System.Diagnostics.EventLogEntryType]::Information, 1 );
-	};
-);
-
-&amp; {
-	[float] $complete = 0;
-	[float] $increment = 100 / $scripts.Count;
-	foreach( $script in $scripts ) {
-		Write-Progress -Activity 'Running scripts to configure this user account. Do not close this window.' -PercentComplete $complete;
-		&amp; $script;
-		$complete += $increment;
-	}
-} *&gt;&amp;1 &gt;&gt; "$env:TEMP\UserOnce.log";
-		</File>
 		<File path="C:\Windows\Setup\Scripts\DefaultUser.ps1">
 $scripts = @(
 	{
 		reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v "StartLayoutFile" /t REG_SZ /d "C:\Windows\Setup\Scripts\TaskbarLayoutModification.xml" /f;
 		reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v "LockedStartLayout" /t REG_DWORD /d 1 /f;
-	};
-	{
-		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "UnattendedSetup" /t REG_SZ /d "powershell.exe -NoProfile -Command \""Get-Content -LiteralPath 'C:\Windows\Setup\Scripts\UserOnce.ps1' -Raw | Invoke-Expression;\""" /f;
 	};
 );
 
