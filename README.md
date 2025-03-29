@@ -36,7 +36,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
   - DISM [(Windows ADK recommended)](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install)
   - PowerShell 5.1+
 - **Storage**: 15GB free space minimum
-- **Media**: Windows 10 22H2/11 ISO ([Official](https://www.microsoft.com/en-us/software-download/windows11) or [UUP dump](https://uupdump.net))
+- **Windows Install Media**: Windows 10 22H2/11 ISO ([Official](https://www.microsoft.com/en-us/software-download/windows11) or [UUP dump](https://uupdump.net))
 
 💡 Tip: Get Windows ISO files from [Microsoft's official site](https://www.microsoft.com/software-download/windows11)
 
@@ -46,6 +46,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    Reinstalling windows, or using tools to erase the disk will result in data loss.
 
 ⚠ **Warning:** This project still being tested. - Use at your own risk. Always backup data before use.
+
 
 1. **Download the Software**
    **Option 1 - Simple ZIP Download:**
@@ -99,13 +100,17 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
        B --> C[Place in WinPE_Drivers]
    ```
 
-4. **Build MurrpTools Media**
+4. **Download Windows Install Media**
+   Download either ([Official](https://www.microsoft.com/en-us/software-download/windows11) Windows Install Media (Easy) or create a [UUP dump](https://uupdump.net) ISO file (Advanced) and keep it in a easy to find location like your Downloads folder.
+
+5. **Build MurrpTools Media**
    **Choose your method:**
 
    🖱️ **Easy Method:**
    1. Find "2 Build MurrpTools Image.cmd" in the folder
    2. You might need to right-click on the file and go into 'Properties'. If there is an 'Unblock' button push it. Otherwise just click OK.
    3. Right-click the file and select "Run as Administrator"
+   4. Follow the prompts, you will be asked for the Windows Install Media ISO file, using the file picker that opens select the ISO file you downloaded earlier.
 
    💻 **PowerShell Method (Admin):**
    ```powershell
