@@ -15,13 +15,13 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 - Multiple Third-Party Utilities
 
 **Complete Toolset Includes:**
-1. Windows Installation Media Creator
-2. Windows Recovery Environment (WinRE)
-3. Windows Preinstallation Environment (WinPE)
-4. System Repair Toolkit (Startup Repair, Disk Tools)
-5. Debloat Tools for Faster Performance
-6. Driver Harvesting/Injection Tool
-7. Essential Utilities:
+- Windows Installation Media Creator
+- Windows Recovery Environment (WinRE)
+- Windows Preinstallation Environment (WinPE)
+- System Repair Toolkit (Startup Repair, Disk Tools)
+- Debloat Tools for Faster Performance
+- Driver Harvesting/Injection Tool
+- Essential Utilities:
    - 7-Zip File Manager
    - Defraggler Disk Optimizer
    - AOMEI Partition Editor
@@ -37,8 +37,6 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
   - PowerShell 5.1+
 - **Storage**: 15GB free space minimum
 - **Windows Install Media**: Windows 10 22H2/11 ISO ([Official](https://www.microsoft.com/en-us/software-download/windows11) or [UUP dump](https://uupdump.net))
-
-💡 Tip: Get Windows ISO files from [Microsoft's official site](https://www.microsoft.com/software-download/windows11)
 
 ## Getting Started Guide
 
@@ -86,7 +84,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
       - [Lenovo Drivers](https://support.lenovo.com/ca/en/solutions/ht074984)
       - [Acer Drivers](https://community.acer.com/en/kb/articles/15378)
    
-   2. Download the Windows PE drivers package(s)
+   2. Download the Windows PE drivers package(s) sometimes called SCCM packages
    
    3. Extract all files (right-click CAB files > "Extract All")
    
