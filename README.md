@@ -1,6 +1,6 @@
 # MurrpTools - Custom Windows Deployment Toolkit
 
-<!-- ![MurrpTools Preview Image](./assets/murrptools-preview.png) -->
+![MurrpTools_Display](https://github.com/user-attachments/assets/967c5d42-681c-47a1-8290-c8942cfef249)
 
 **Warning:** This project is in active development - use at your own risk. Always backup data before use.
 
