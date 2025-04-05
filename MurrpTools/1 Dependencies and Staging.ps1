@@ -136,7 +136,7 @@ function Get-BuildLocation {
                 Write-CompletionFile -Path $(Join-Path $selectedPath "MurrpTools")
             }
             
-            return $selectedPath
+            return  $(Join-Path $selectedPath "MurrpTools")
         }
         else {
             Write-Warning "Folder selection was cancelled"
