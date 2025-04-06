@@ -96,7 +96,7 @@ Write-Host "The unit model is of this system is $model"
 if (Test-Path $DriverExportPath) {
     $ChoiceExportDrivers = Ask-YesNoQuestion -Question "`nThere appears to already be harvested drivers at $DriverExportPath`nWould you like to export drivers anyways?" -DefaultResponse "No"
 } else {
-    $ChoiceExportDrivers = Ask-YesNoQuestion -Question "`nThere are no drivers exported for this system available.`nAttempt to export drivers to $DriverExportPath?" -DefaultResponse "Yes"
+    $ChoiceExportDrivers = Ask-YesNoQuestion -Question "`nThere are no drivers exported for this system available.`nAttempt to export drivers to $DriverExportPath`?" -DefaultResponse "Yes"
 }
 
 if ($ChoiceExportDrivers -eq $true) {

@@ -112,6 +112,7 @@ do {
     }
 
     # Tool details and execution loop
+    $ExitToolMenu = $false # Flag to exit the ToolOption menu
     do {
         Show-ToolDetails -Tool $SelectedTool
         $ToolOption = Read-Host "`nSelect an option"
@@ -133,6 +134,7 @@ do {
 
                         # Clean up the temporary file
                         Remove-Item -Path $TempScriptPath -Force
+                        $ExitToolMenu = $true # Set flag to exit ToolOption menu
                         break
                     } else {
                         Write-Host "Internet access is not available." -ForegroundColor Red
@@ -141,17 +143,25 @@ do {
                 2 {
                     if ($SelectedTool.AvailableOffline) {
                         Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$($SelectedTool.Filename)`"" -Wait
+                        $ExitToolMenu = $true # Set flag to exit ToolOption menu
                         break
                     } else {
                         Write-Host "Offline file not available." -ForegroundColor Red
                     }
                 }
-                0 { break }
+                0 {
+                    $ExitToolMenu = $true # Set flag to exit ToolOption menu
+                    break
+                }
                 default {
                     Write-Host "Invalid option. Please try again." -ForegroundColor Red
                 }
             }
         }
+
+        # Exit the ToolOption menu if the flag is set
+        if ($ExitToolMenu) { break }
+
     } while ($ToolOption -ne 0)
 
 } while ($Selection -ne 0)
