@@ -416,6 +416,11 @@ function Add-Services {
 
 function Add-Drivers {    
     Write-Host "`nAdding Windows PE Drivers provided by user..."
+    #Rename any Autorun.inf file to Autorun.inf.disabled to prevent Add-WindowsDriver from failing
+    Get-ChildItem -Path $driversDir -Recurse -Filter "Autorun.inf" | ForEach-Object {
+        Rename-Item -Path $_.FullName -NewName "Autorun.inf.disabled" -Force
+    }
+    # Add drivers to the mounted WIM
     try {
         Add-WindowsDriver -Driver $driversDir -Recurse -Path $mountDir
         Write-Host "`nDrivers added successfully."
@@ -556,7 +561,7 @@ function Build-MurrpToolsISO {
             throw "$oscdimg is missing. Unable to create ISO file."
         }
         Set-Location $scriptDir
-        & $oscdimg -bootdata:"2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`"" -o -m -u2 -udfver102 -lMurrpTools "$bootMediaDir" MurrpTools.ISO
+        & $oscdimg -bootdata:"2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`"" -o -m -u2 -udfver102 -lMurrpTools "$bootMediaDir" MurrpTools.iso
         Write-Host "`nMurrpTools.iso built at $MurrpToolsISOPath`n"
     }
     catch {
