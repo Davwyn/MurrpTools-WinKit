@@ -121,3 +121,4 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 - **Beta Testers** - Valuable feedback:
   - Aeros Endeem
   - Sky (Skybox Monster)
+  - Lord Flame Stryke
