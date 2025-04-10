@@ -422,7 +422,7 @@ function Add-Drivers {
     }
     # Add drivers to the mounted WIM
     try {
-        Add-WindowsDriver -Driver $driversDir -Recurse -Path $mountDir
+        Add-WindowsDriver -Driver $driversDir -Recurse -Path $mountDir -Verbose
         Write-Host "`nDrivers added successfully."
     }
     catch {

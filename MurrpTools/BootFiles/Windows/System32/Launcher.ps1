@@ -72,6 +72,7 @@ $QuickLaunchAdditions["Bypass Windows 11 Requirements for Generic Setup"] = "Dis
 if ($HarvestDriversSource) {
     $QuickLaunchAdditions["Harvest Drivers"] = $HarvestDriversSource
 }
+$QuickLaunchAdditions["Wifi Manager"] = "& 'X:\Windows\System32\WifiManager.ps1'"
 $QuickLaunchAdditions["Notepad"] = "notepad.exe"
 $QuickLaunchAdditions["Maximize This Menu"] = "Maximize-Window"
 $QuickLaunchAdditions["Window This Menu"] = "Restore-Window"
