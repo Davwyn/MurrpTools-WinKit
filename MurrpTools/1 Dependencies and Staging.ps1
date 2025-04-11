@@ -208,6 +208,7 @@ $BuildSource_Root = @(
 
 $BuildSource_ProgramFiles = @(
     "Dependencies\7-Zip\7-Zip",
+    "Dependencies\PE Network Manager\PENetwork_x64",
     "Dependencies\AOMEI\AOMEIPartAssist",
     "Dependencies\Paehl\checkdisk_64bit",
     "Dependencies\ChrisHall\ChkDskGUI_x64",
@@ -228,11 +229,15 @@ $BuildSource_System32 = @(
     "Dependencies\Sysinternals\BGInfo\Bginfo64.exe"
 ) | ForEach-Object { Join-Path $parentDir $_ }
 
+$BuildSource_DebloatTools = @(
+    "Dependencies\PE Network Manager\PENetwork_x64"
+) | ForEach-Object { Join-Path $parentDir $_ }
+
 # Script Start
 Write-Host "Validating expected files..."
 # Validate all source paths
 $missingPaths = @()
-$allSourcePaths = $BuildSource_Root + $BuildSource_ProgramFiles + $BuildSource_System32
+$allSourcePaths = $BuildSource_Root + $BuildSource_ProgramFiles + $BuildSource_System32 + $BuildSource_DebloatTools
 
 foreach ($path in $allSourcePaths) {
     if ($path -and -not (Test-Path $path)) {
@@ -265,6 +270,7 @@ $BuildLocation = Get-BuildLocation
 $BuildDest_Root = $BuildLocation
 $BuildDest_ProgramFiles = Join-Path $BuildLocation "BootFiles\Program Files\"
 $BuildDest_System32 = Join-Path $BuildLocation "BootFiles\Windows\System32\"
+$BuildDest_DebloatTools = Join-Path $BuildLocation "MediaFiles\`$OEM`$\`$1\DebloatTools"
 
 # Execute the copy operations
 Write-Host "`nCopying dependencies..."
@@ -279,6 +285,9 @@ Copy-Items -Destination $BuildDest_ProgramFiles -SourcePaths $BuildSource_Progra
 
 # Copy system32 files
 Copy-Items -Destination $BuildDest_System32 -SourcePaths $BuildSource_System32 -Verbose:$verbose
+
+# Copy Media files
+Copy-Items -Destination $BuildDest_DebloatTools -SourcePaths $BuildSource_DebloatTools -Verbose:$verbose
 
 Write-Host "`nCopy operations completed. Review any warnings above if any.`n"
 Write-Host $border -ForegroundColor Cyan

@@ -118,6 +118,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 ## Special Thanks
 - **Tiny11 Builder Team** - Provided great resources to understand custom image generation.
 - **UUP Dump Project** - Both useful project in general, and their scripts helped to understand customizing Windows images, as well as building the ISO file.
+- **Hiren's Boot CD PE** - Learned and still learning amazing things done in Hiren's BootCD project. Easily the best multi-purpose boot utility kit out there. [Link](https://www.hirensbootcd.org)
+
 - **Beta Testers** - Valuable feedback:
   - Aeros Endeem
   - Sky (Skybox Monster)
