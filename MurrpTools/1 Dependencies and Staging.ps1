@@ -32,7 +32,7 @@ param (
     [string]$BuildPath
 )
 
-$MurrpToolsVersion = "0.1.1 Alpha"
+$MurrpToolsVersion = "v0.1.1-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
 
