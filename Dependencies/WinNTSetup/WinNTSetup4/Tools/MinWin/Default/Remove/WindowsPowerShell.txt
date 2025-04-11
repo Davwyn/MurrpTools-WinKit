@@ -1,7 +1,0 @@
-\Windows\System32\WindowsPowerShell
-\Windows\SysWOW64\WindowsPowerShell
-
-\Program Files\WindowsPowerShell
-\Program Files (x86)\WindowsPowerShell
-
-\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows PowerShell

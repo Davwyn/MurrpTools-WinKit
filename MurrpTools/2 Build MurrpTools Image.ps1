@@ -73,12 +73,14 @@ function Script-Exit {
 
     if ($isSuccess) {
         Write-Host "`nScript completed successfully" -ForegroundColor Green
-        pause
-        exit 0
+        Pause
+        $global:LASTEXITCODE = 0
+        return
     } else {
         Write-Host "`nScript failed" -ForegroundColor Red
-        pause
-        exit 1
+        Pause
+        $global:LASTEXITCODE = 1
+        return
     }
 }
 
@@ -422,7 +424,7 @@ function Add-Drivers {
     }
     # Add drivers to the mounted WIM
     try {
-        Add-WindowsDriver -Driver $driversDir -Recurse -Path $mountDir -Verbose
+        Add-WindowsDriver -Driver $driversDir -Recurse -Path $mountDir -Verbose | Out-Host
         Write-Host "`nDrivers added successfully."
     }
     catch {
