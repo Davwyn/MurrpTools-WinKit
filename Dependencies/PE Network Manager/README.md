@@ -1,5 +1,7 @@
-# Dirk Paehl
+# Holger's PE Network Manager
 
-Check Disk (chkdsk) disk repair software. Property of Dirk Paehl.
+Fantastic tool for getting connected to networks and wifi in Windows PE.
 
-https://www.paehl.de/?Checkdisk
+https://www.penetworkmanager.de
+
+https://sourceforge.net/projects/penetwork
