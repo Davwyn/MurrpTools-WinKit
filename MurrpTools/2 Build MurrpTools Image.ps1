@@ -34,7 +34,7 @@ param (
 )
 
 # Script-level variables
-$MurrpToolsVersion = "0.1 Alpha"
+$MurrpToolsVersion = "0.1.1 Alpha"
 $scriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
 $mountDir = "$scriptDir\mount"
 $bootMediaDir = "$scriptDir\BootMedia"
