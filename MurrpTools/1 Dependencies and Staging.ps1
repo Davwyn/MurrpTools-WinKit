@@ -32,7 +32,7 @@ param (
     [string]$BuildPath
 )
 
-$MurrpToolsVersion = "v0.1.1-Alpha"
+$MurrpToolsVersion = "v0.1.2-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
 
@@ -105,7 +105,7 @@ function Copy-MurrpTools {
     if ($Verbose) { $copyParams['Verbose'] = $true }
     
     try {
-        Copy-Item @copyParams
+        Copy-Item @copyParams -ErrorAction Stop
         Write-Host "`nCopied MurrpTools folder to $DestinationPath (excluding $ScriptFileName)"
     }
     catch {
@@ -137,15 +137,14 @@ function Get-BuildLocation {
             Script-Exit $false
         }
         
-        
-        Copy-MurrpTools -SourcePath $sourcePath -DestinationPath $BuildPath
-        
-        # Create completion file if location is different from script directory
         if ($BuildPath -ne $sourcePath) {
+            #Copy MurrpTools as it's a different location
+            Copy-MurrpTools -SourcePath $sourcePath -DestinationPath $BuildPath
+            # Create completion file if location is different from script directory
             Write-CompletionFile -Path $(Join-Path $BuildPath "MurrpTools")
         }
         
-        return $(Join-Path $BuildPath "MurrpTools")
+        return $BuildPath
     }
     
     # Offer location selection options
@@ -168,11 +167,10 @@ function Get-BuildLocation {
             #Sleep for a moment to allow the dialog to close and folder to be created if the user makes a new folder
             Start-Sleep 2
             
-            
-            Copy-MurrpTools -SourcePath $sourcePath -DestinationPath $selectedPath
-            
-            # Create completion file if location is different from script directory
             if ($selectedPath -ne $sourcePath) {
+                #Copy MurrpTools as it's a different location
+                Copy-MurrpTools -SourcePath $sourcePath -DestinationPath $selectedPath
+                # Create completion file if location is different from script directory
                 Write-CompletionFile -Path $(Join-Path $selectedPath "MurrpTools")
             }
             
@@ -218,7 +216,7 @@ function Copy-Items {
                     Force = $true
                 }
                 if ($Verbose) { $copyParams['Verbose'] = $true }
-                Copy-Item @copyParams
+                Copy-Item @copyParams -ErrorAction Stop
                 Write-Host "Copied $Source to $Destination"
             }
             catch {
@@ -257,18 +255,18 @@ function Expand-Dependencies {
             Script-Exit $false
         }
         try {
-            # Run 7-Zip to extract the archive using Start-Process
-            Start-Process -FilePath $7ZipPath -ArgumentList "x `"$ArchivePath`" -o`"$ExtractTo`" -y" -NoNewWindow -Wait
-            if ($LASTEXITCODE -eq 0) {
+            # Run 7-Zip to extract the archive using Start-Process with -PassThru
+            $process = Start-Process -FilePath $7ZipPath -ArgumentList "x `"$ArchivePath`" -o`"$ExtractTo`" -y" -NoNewWindow -Wait -PassThru
+            if ($process.ExitCode -eq 0) {
                 Write-Host "`nExtraction completed successfully." -ForegroundColor Green
 
                 # Delete all matching archive parts
                 Get-ChildItem -Path $ExtractTo -Filter "Dependencies.7z.*" | ForEach-Object {
                     Remove-Item -Path $_.FullName -Force
                 }
-                Write-Host "`nCleaned up depdendency archives." -ForegroundColor Green
+                Write-Host "`nCleaned up dependency archives." -ForegroundColor Green
             } else {
-                Log-Error "7-Zip extraction failed with exit code $LASTEXITCODE."
+                Log-Error "7-Zip extraction failed with exit code $($process.ExitCode)."
                 Script-Exit $false
             }
         } catch {
@@ -374,23 +372,23 @@ $BuildDest_BootFiles = Join-Path $BuildLocation "BootFiles\"
 # Execute the copy operations
 Write-Host "`nCopying dependencies..." -ForegroundColor Yellow
 
-$verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
-
-# Copy root items
-Copy-Items -Destination $BuildDest_Root -SourcePaths $BuildSource_Root -Verbose:$verbose
-
-# Copy custom program files
-Copy-Items -Destination $BuildDest_ProgramFiles -SourcePaths $BuildSource_ProgramFiles -Verbose:$verbose
-
-# Copy system32 files
-Copy-Items -Destination $BuildDest_System32 -SourcePaths $BuildSource_System32 -Verbose:$verbose
-
-# Copy Media files
-Copy-Items -Destination $BuildDest_DebloatTools -SourcePaths $BuildSource_DebloatTools -Verbose:$verbose
-
-# Copy additional boot files if they exist
-if ($BuildSource_BootFiles) {
-    Copy-Items -Destination $BuildDest_BootFiles -SourcePaths $BuildSource_BootFiles -Verbose:$verbose
+try {
+    $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
+    # Copy root items
+    Copy-Items -Destination $BuildDest_Root -SourcePaths $BuildSource_Root -Verbose:$verbose -ErrorAction Stop    
+    # Copy custom program files
+    Copy-Items -Destination $BuildDest_ProgramFiles -SourcePaths $BuildSource_ProgramFiles -Verbose:$verbose -ErrorAction Stop
+    # Copy system32 files
+    Copy-Items -Destination $BuildDest_System32 -SourcePaths $BuildSource_System32 -Verbose:$verbose -ErrorAction Stop
+    # Copy Media files
+    Copy-Items -Destination $BuildDest_DebloatTools -SourcePaths $BuildSource_DebloatTools -Verbose:$verbose -ErrorAction Stop
+    # Copy additional boot files if they exist
+    if ($BuildSource_BootFiles) {
+        Copy-Items -Destination $BuildDest_BootFiles -SourcePaths $BuildSource_BootFiles -Verbose:$verbose -ErrorAction Stop
+    }
+} catch {
+    Log-Error "Failed to copy dependencies: $_"
+    Script-Exit $false
 }
 
 Write-Host "`nCopy operations completed. Review any warnings above if any.`n" -ForegroundColor Green
