@@ -67,13 +67,11 @@ function Script-Exit {
     if ($isSuccess) {
         Write-Host "`nScript completed successfully" -ForegroundColor Green
         Pause
-        $global:LASTEXITCODE = 0
-        return
+        exit 0
     } else {
         Write-Host "`nScript failed" -ForegroundColor Red
         Pause
-        $global:LASTEXITCODE = 1
-        return
+        exit 1
     }
 }
 
