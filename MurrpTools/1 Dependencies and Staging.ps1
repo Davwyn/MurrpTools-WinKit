@@ -12,6 +12,9 @@ The script provides a Folder Picker UI to select the destination path. Alternati
 .PARAMETER BuildPath
 Specifies the destination path for the build. If not provided, a Folder Picker UI will be shown to select the path.
 
+.PARAMETER BuildSelf
+If specified, the script will copy dependencies to the project directory itself. If both -BuildPath and -BuildSelf are provided, -BuildSelf takes precedence.
+
 .EXAMPLE
 PS> .\1 Dependencies and Staging.ps1
 Shows the Folder Picker UI to select destination path
@@ -19,6 +22,9 @@ Shows the Folder Picker UI to select destination path
 .EXAMPLE
 PS> .\1 Dependencies and Staging.ps1 -BuildPath "C:\Build"
 Copies dependencies to the specified build path
+
+PS> .\1 Dependencies and Staging.ps1 -BuildSelf
+Copies dependencies to the project directory itself.
 
 .NOTES
 When using the Folder Picker UI:
@@ -29,10 +35,11 @@ When using the Folder Picker UI:
 
 [CmdletBinding()]
 param (
-    [string]$BuildPath
+    [string]$BuildPath,
+    [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.2-Alpha"
+$MurrpToolsVersion = "v0.1.3-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
 
@@ -103,8 +110,9 @@ function Copy-MurrpTools {
     if ($Verbose) { $copyParams['Verbose'] = $true }
     
     try {
+        Write-Host "`nCopying MurrpTools folder to $DestinationPath (excluding $ScriptFileName)..." -ForegroundColor Yellow
         Copy-Item @copyParams -ErrorAction Stop
-        Write-Host "`nCopied MurrpTools folder to $DestinationPath (excluding $ScriptFileName)"
+        Write-Host "`nMurrpTools folder copied." -ForegroundColor Green
     }
     catch {
         Log-Error "Failed to copy MurrpTools folder: $_"
@@ -113,16 +121,25 @@ function Copy-MurrpTools {
     }
 }
 
-function Get-BuildLocation {
-    $sourcePath = $PSScriptRoot
+function Get-BuildLocation {    
+    $parentDir = Split-Path $PSScriptRoot -Parent
     
+    # If the BuildSelf switch is set, use the script directory as the build path
+    if ($BuildSelf) {
+        $BuildPath = $parentDir
+    }
+
     # If BuildPath was provided, use it after validation
     if ($BuildPath) {
-        # Handle current directory notation
-        if ($BuildPath -eq "." -or $BuildPath -eq ".\") {
-            $BuildPath = $sourcePath
+
+        # Resolve the path to handle relative paths and ensure it's absolute
+        try {
+            $BuildPath = Resolve-Path $BuildPath -ErrorAction Stop
+        } catch {
+            Log-Error "Path does not exist: $BuildPath"
+            Script-Exit $false
         }
-        
+
         # Verify path exists
         if (-not (Test-Path $BuildPath)) {
             Log-Error "Specified path does not exist"
@@ -130,14 +147,14 @@ function Get-BuildLocation {
         }
         
         # Verify path is not within script directory or subdirectories
-        if ($BuildPath -like "$sourcePath*" -and $BuildPath -ne $sourcePath) {
-            Log-Error "Path cannot be a subdirectory of the script directory"
+        if ((Resolve-Path $BuildPath).ProviderPath -like "$((Resolve-Path $PSScriptRoot).ProviderPath)*") {
+            Log-Error "Path ($BuildPath) cannot be a subdirectory of the script directory."
             Script-Exit $false
         }
         
-        if ($BuildPath -ne $sourcePath) {
+        if ((Resolve-Path $BuildPath).ProviderPath -ne (Resolve-Path $parentDir).ProviderPath) {
             #Copy MurrpTools as it's a different location
-            Copy-MurrpTools -SourcePath $sourcePath -DestinationPath $BuildPath
+            Copy-MurrpTools -SourcePath $PSScriptRoot -DestinationPath $BuildPath
             # Create completion file if location is different from script directory
             Write-CompletionFile -Path $(Join-Path $BuildPath "MurrpTools")
         }
@@ -146,12 +163,14 @@ function Get-BuildLocation {
     }
     
     # Offer location selection options
-    Write-Host "Option 1: Use current location ($sourcePath)"
+    Write-Host "`n`nThis script will copy all dependencies to the MurrpTools project folder, or Murrptools with dependencies installed to a different location." -ForegroundColor Cyan
+    Write-Host "`nPlease select one of the options below to prepare MurrpTools for building images."
+    Write-Host "Option 1: Use current location ($PSScriptRoot)"
     Write-Host "Option 2: Select a different using Folder Picker"
     $choice = Read-Host "`nEnter choice (1 or 2)"
     
     if ($choice -eq "1") {
-        return $sourcePath
+        return $PSScriptRoot
     }
     elseif ($choice -eq "2") {
         # GUI folder picker
@@ -165,9 +184,9 @@ function Get-BuildLocation {
             #Sleep for a moment to allow the dialog to close and folder to be created if the user makes a new folder
             Start-Sleep 2
             
-            if ($selectedPath -ne $sourcePath) {
+            if ($selectedPath -ne $PSScriptRoot) {
                 #Copy MurrpTools as it's a different location
-                Copy-MurrpTools -SourcePath $sourcePath -DestinationPath $selectedPath
+                Copy-MurrpTools -SourcePath $PSScriptRoot -DestinationPath $selectedPath
                 # Create completion file if location is different from script directory
                 Write-CompletionFile -Path $(Join-Path $selectedPath "MurrpTools")
             }
@@ -215,7 +234,7 @@ function Copy-Items {
                 }
                 if ($Verbose) { $copyParams['Verbose'] = $true }
                 Copy-Item @copyParams -ErrorAction Stop
-                Write-Host "Copied $Source to $Destination"
+                Write-Host "Copied $Source`nTo $Destination"
             }
             catch {
                 Log-Warning "Failed to copy $Source`: $_"
@@ -354,9 +373,6 @@ if ($missingPaths.Count -gt 0) {
     Write-Host "`nBasic file validation passed." -ForegroundColor Green
 }
 
-Write-Host "`n`nThis script will copy all dependencies to the MurrpTools project folder, or Murrptools with dependencies installed to a different location." -ForegroundColor Cyan
-Write-Host "`nPlease select one of the options below to prepare MurrpTools for building images."
-
 # Get build location
 $BuildLocation = Get-BuildLocation
 
@@ -391,7 +407,7 @@ try {
 
 Write-Host "`nCopy operations completed. Review any warnings above if any.`n" -ForegroundColor Green
 Write-Host $border -ForegroundColor Cyan
-Write-Host "`nPlease now naivate to $BuildLocation"
+Write-Host "`nPlease now navigate to $BuildLocation"
 Write-Host "`nAdd any desired Windows PE Drivers to the WinPE_Drivers folder.`nIf you need help finding drivers, check the ReadMe file in that folder."
 Write-Host "Once you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
 if (!($BuildPath)) {

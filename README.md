@@ -73,8 +73,13 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    2. Select "Windows Terminal (Admin)"
    3. Copy/paste this command:
    ```powershell
-   .\MurrpTools\1_Dependencies_and_Staging.ps1 -BuildPath .
+   .\MurrpTools\1_Dependencies_and_Staging.ps1 -BuildSelf
    ```
+   or to build in a specific folder:
+   ```powershell
+   .\MurrpTools\1_Dependencies_and_Staging.ps1 -BuildPath C:\Build
+   ```
+   In which you replace C:\Build with the path you'd like to build the project.
 
 3. **Prepare Drivers**
    **For best compatibility:**
@@ -120,7 +125,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 - **UUP Dump Project** - Both useful project in general, and their scripts helped to understand customizing Windows images, as well as building the ISO file.
 - **Hiren's Boot CD PE** - Learned and still learning amazing things done in Hiren's BootCD project. Easily the best multi-purpose boot utility kit out there. [Link](https://www.hirensbootcd.org)
 
-- **Beta Testers** - Valuable feedback:
+- **Alpha/Beta Testers** - Valuable feedback:
   - Aeros Endeem
   - Sky (Skybox Monster)
   - Lord Flame Stryke
+  - Kehvarl
