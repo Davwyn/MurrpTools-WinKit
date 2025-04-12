@@ -67,7 +67,6 @@ function Show-Menu {
 function Show-ToolDetails {
     param ($Tool)
     # Check for internet access
-    $InternetAccess = Test-Connection -ComputerName "www.github.com" -Count 1 -Quiet
     
     Clear-Host
     $Border = "*" * 50
@@ -135,6 +134,7 @@ do {
     # Tool details and execution loop
     $ExitToolMenu = $false # Flag to exit the ToolOption menu
     do {
+        $InternetAccess = Test-Connection -ComputerName "www.github.com" -Count 1 -Quiet
         Show-ToolDetails -Tool $SelectedTool
         $ToolOption = Read-Host "`nSelect an option"
 
