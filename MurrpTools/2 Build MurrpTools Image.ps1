@@ -34,11 +34,12 @@ param (
 )
 
 # Script-level variables
-$MurrpToolsVersion = "v0.1.5-Alpha"
+$MurrpToolsVersion = "v0.1.6-Alpha"
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
 $mountDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "mount"
 $bootMediaDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "BootMedia"
 $driversDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "WinPE_Drivers"
+$Script:packageDir = $null
 $Script:errorLog = @()
 $Script:warningLog = @()
 $Script:ISOmountResult = $null
@@ -186,7 +187,20 @@ function Validate-ISO {
         # Check if the current version is valid
         if (($currentVersion -lt $minVersionWin10) -and ($currentVersion -lt $minVersionWin11)) {
             Dismount-DiskImage -InputObject $mountResult | Out-Null
-            throw "ISO is not Windows 10 22H2 or higher, or Windows 11."
+            throw "ISO is not 64x Windows 10 22H2 or higher, or Windows 11."
+        }
+
+        if (($currentVersion -ge $minVersionWin10) -and ($currentVersion -lt $minVersionWin11)) {
+            Write-Host "Windows 10 22H2 detected." -ForegroundColor Green
+            $Script:packageDir = Join-Path $MurrpToolsScriptPath "Win10_WinPE_OCs"
+        } elseif ($currentVersion -ge $minVersionWin11) {
+            Write-Host "Windows 11 or higher detected." -ForegroundColor Green
+            $Script:packageDir = Join-Path $MurrpToolsScriptPath "Win11_WinPE_OCs"
+        } else {
+            Write-Host "Unsupported Windows version detected." -ForegroundColor Red
+            Write-Host "Expected version: $minVersionWin10, $minVersionWin11 or higher" -ForegroundColor Red
+            Dismount-DiskImage -InputObject $mountResult | Out-Null
+            throw "Unsupported Windows version detected."
         }
 
         return $mountResult, $driveLetter
@@ -355,7 +369,7 @@ function Add-Customizations {
 }
 
 function Add-Packages {    
-    Write-Host "`nAdding image packages..."
+    Write-Host "`nAdding image packages from $Script:packageDir`..."
     $packages = @(
         "WinPE-FMAPI.cab",
         "WinPE-EnhancedStorage.cab",
@@ -383,11 +397,9 @@ function Add-Packages {
         "WinPE-StorageWMI.cab",
         "en-us\WinPE-StorageWMI_en-us.cab"
     )
-
-    $packageDir = Join-Path $MurrpToolsScriptPath "Win11_WinPE_OCs"
     
     foreach ($package in $packages) {
-        $packagePath = Join-Path $packageDir $package
+        $packagePath = Join-Path $Script:packageDir $package
         try {
             Add-WindowsPackage -PackagePath $packagePath -Path $mountDir
             Write-Host "Added package: $package"
@@ -591,8 +603,8 @@ if (!($ISOImage)) {
     Write-Host "MurrpTools Image Builder" -ForegroundColor Green
     Write-Host "Version: $MurrpToolsVersion" -ForegroundColor Green
     Write-Host $border -ForegroundColor Cyan
-    Write-Host "`nThis script will build a custom MurrpTools Windows Installation and WinPE image.`n"
-    Write-Host "You will need to supply MurrpTools Image builder either a Windows 10 22H2, or Windows 11 installation media ISO file or optionally one built using UUP Dump. It must be in ISO format.`n"
+    Write-Host "`nThis script will build a custom MurrpTools 64bit Windows Installation and WinPE image.`n"
+    Write-Host "You will need to supply MurrpTools Image builder either a 64bit Windows 10 22H2, or 64bit Windows 11 installation media ISO file or optionally one built using UUP Dump. It must be in ISO format.`n"
     Write-Host "`nPress enter and a selection window will open to select the ISO file."
     Pause
     Write-Host ""

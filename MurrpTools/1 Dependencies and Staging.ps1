@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.5-Alpha"
+$MurrpToolsVersion = "v0.1.6-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
@@ -319,7 +319,8 @@ function Expand-Dependencies {
 # Variable Definitions
 $BuildSource_Root = @(
     "Dependencies\Microsoft\WinPE_ADK\oscdimg.exe",
-    "Dependencies\Microsoft\WinPE_ADK\Win11_WinPE_OCs"
+    "Dependencies\Microsoft\WinPE_ADK\Win11_WinPE_OCs",
+    "Dependencies\Microsoft\WinPE_ADK\Win10_WinPE_OCs"
 ) | ForEach-Object { Join-Path $ProjectRootPath $_ }
 
 $BuildSource_ProgramFiles = @(

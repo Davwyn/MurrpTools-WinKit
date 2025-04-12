@@ -88,7 +88,9 @@ Website: https://microsoft.com
 
 Windows PE Packages as part of the Microsoft ADK needed to add components such as PowerShell to Windows PE
 
-Win11_WinPE_OCs is optional Windows PE Addons as part of the ADK WinPE Add-on.
+Win10_WinPE_OCs is optional Windows PE Addons for Windows 10 as part of the ADK WinPE Add-on.
+
+Win11_WinPE_OCs is optional Windows PE Addons for Windows 11as part of the ADK WinPE Add-on.
 
 oscdimg.exe
 Part of Microsoft Assessment and Deployment Toolkit
