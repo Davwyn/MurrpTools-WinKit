@@ -34,11 +34,11 @@ param (
 )
 
 # Script-level variables
-$MurrpToolsVersion = "v0.1.4-Alpha"
-$scriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
-$mountDir = "$scriptDir\mount"
-$bootMediaDir = "$scriptDir\BootMedia"
-$driversDir = "$scriptDir\WinPE_Drivers"
+$MurrpToolsVersion = "v0.1.5-Alpha"
+$MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
+$mountDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "mount"
+$bootMediaDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "BootMedia"
+$driversDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "WinPE_Drivers"
 $Script:errorLog = @()
 $Script:warningLog = @()
 $Script:ISOmountResult = $null
@@ -128,7 +128,7 @@ function Test-Admin {
 function Initialize-Directories {    
     try {
         # Create mount directory at script location
-        New-Item -ItemType Directory -Path "$scriptDir\mount" -ErrorAction Stop | Out-Null
+        New-Item -ItemType Directory -Path "$MurrpToolsScriptPath\mount" -ErrorAction Stop | Out-Null
         Write-Host "Mount directory created successfully."
     }
     catch {
@@ -224,8 +224,8 @@ function Copy-WithProgress {
 
             # Update progress
             Write-Progress -Activity "Copying files..." `
-                           -Status "Copying $relativePath" `
-                           -PercentComplete (($currentFile / $totalFiles) * 100)
+            -Status "Copying $relativePath" `
+            -PercentComplete (($currentFile / $totalFiles) * 100)
         }
 
         Write-Progress -Activity "Copying files..." -Completed
@@ -241,7 +241,15 @@ function Build-Image {
     $Script:ISOmountResult = $null
     
     if ($ISOImage) {
-        Write-Host "ISO Image supplied as: $ISOImage"
+        # Resolve the provided path
+        try {
+            $ISOImage = Resolve-Path $ISOImage
+            Write-Host "ISO Image supplied as: $ISOImage"
+        } catch {
+            Log-Error "Failed to resolve ISO path: $_"
+            Cleanup
+            Script-Exit $false
+        }
         # Use provided ISO path
         if (-not (Test-Path $ISOImage)) {
             Log-Error "Specified ISO file does not exist: $ISOImage"
@@ -323,7 +331,7 @@ function Add-Customizations {
         Remove-Item "$mountDir\windows\system32\winpeshl.ini" -Force -ErrorAction SilentlyContinue
         
         # Copy custom files with proper attribute handling
-        $BootFilesDir = Join-Path $scriptDir "BootFiles"
+        $BootFilesDir = Join-Path $MurrpToolsScriptPath "BootFiles"
         Get-ChildItem -Path $BootFilesDir -Recurse | ForEach-Object {
             $destPath = $_.FullName.Replace($BootFilesDir, $mountDir)
             if (Test-Path $destPath) {
@@ -376,7 +384,7 @@ function Add-Packages {
         "en-us\WinPE-StorageWMI_en-us.cab"
     )
 
-    $packageDir = Join-Path $scriptDir "Win11_WinPE_OCs"
+    $packageDir = Join-Path $MurrpToolsScriptPath "Win11_WinPE_OCs"
     
     foreach ($package in $packages) {
         $packagePath = Join-Path $packageDir $package
@@ -396,7 +404,7 @@ function Add-Packages {
 function Add-Services {    
     Write-Host "`nAdding MurrpTools services..."
     $startnetPath = "$mountDir\windows\system32\STARTNET.CMD"
-    $appendFile = "$scriptDir\ExtendedStartnetCommands.append"
+    $appendFile = "$MurrpToolsScriptPath\ExtendedStartnetCommands.append"
     
     try {
         if (-not (Test-Path $appendFile)) {
@@ -461,7 +469,7 @@ function Add-MediaFiles {
     try {
         Write-Host "`nAdding MurrpTools media files..."        
         # Copy custom files with proper attribute handling
-        $MediaFilesDir = Join-Path $scriptDir "MediaFiles"
+        $MediaFilesDir = Join-Path $MurrpToolsScriptPath "MediaFiles"
         Get-ChildItem -Path $MediaFilesDir -Recurse | ForEach-Object {
             $destPath = $_.FullName.Replace($MediaFilesDir, $bootMediaDir)
             if (Test-Path $destPath) {
@@ -486,7 +494,7 @@ function Add-MediaFiles {
 function Add-DebloatTools {
     Write-Host "`nAdding Debloat Tools..."
 
-    $debloatToolsFile = Join-Path $scriptDir "DebloatTools.json"
+    $debloatToolsFile = Join-Path $MurrpToolsScriptPath "DebloatTools.json"
     $setupDir = Join-Path  $bootMediaDir "`$OEM`$\`$1\DebloatTools"
     $outputJsonPath = Join-Path $setupDir "DebloatTools.json"
 
@@ -551,8 +559,8 @@ function Add-DebloatTools {
 function Build-MurrpToolsISO {
     try {
         Write-Host "`nBuilding MurrpTools ISO Image..."
-        $oscdimg = Join-Path $scriptDir "oscdimg.exe"
-        $MurrpToolsISOPath = Join-Path $scriptDir "MurrpTools.iso"
+        $oscdimg = Join-Path $MurrpToolsScriptPath "oscdimg.exe"
+        $MurrpToolsISOPath = Join-Path $MurrpToolsScriptPath "MurrpTools.iso"
         if (Test-Path $MurrpToolsISOPath) { 
             Write-Host "Removing existing MurrpTools.iso file"
             Remove-Item $MurrpToolsISOPath -Force -ErrorAction Stop
@@ -560,7 +568,6 @@ function Build-MurrpToolsISO {
         if (!(Test-Path $oscdimg)) {
             throw "$oscdimg is missing. Unable to create ISO file."
         }
-        Set-Location $scriptDir
         & $oscdimg -bootdata:"2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`"" -o -m -u2 -udfver102 -lMurrpTools "$bootMediaDir" MurrpTools.iso
         Write-Host "`nMurrpTools.iso built at $MurrpToolsISOPath`n"
     }
@@ -592,7 +599,7 @@ if (!($ISOImage)) {
 }
 
 try {
-    Set-Location $scriptDir
+    Set-Location $MurrpToolsScriptPath
     Cleanup
     Write-Verbose "Initalize Directories"
     Initialize-Directories
@@ -627,7 +634,7 @@ try {
     $border = "*" * 60
     Write-Host $border -ForegroundColor Cyan
     Write-Host "MurrpTools WinPE with customizations has been built successfully." -ForegroundColor Green
-    Write-Host "Look for the MurrpTools.iso file located at:`n  $scriptDir" -ForegroundColor Green
+    Write-Host "Look for the MurrpTools.iso file located at:`n  $MurrpToolsScriptPath" -ForegroundColor Green
     Write-Host "Use a tool such as Rufus to deploy the ISO image to your flash drive`." -ForegroundColor Green
     Write-Host "Rufus: https://rufus.ie" -ForegroundColor Green
     Write-Host "`n*Reccomended setings for Rufus:`n  Partition scheme: GPT`n  Target System: UEFI`n  File system: NTFS`n  (Unchecked) Create extended label and icon files." -ForegroundColor DarkMagenta

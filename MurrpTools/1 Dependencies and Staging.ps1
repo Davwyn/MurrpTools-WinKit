@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.4-Alpha"
+$MurrpToolsVersion = "v0.1.5-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
@@ -394,6 +394,7 @@ if ($missingPaths.Count -gt 0) {
 
 # Get build location
 $BuildLocation = Get-BuildLocation
+$BuildLocation = Resolve-Path $BuildLocation -ErrorAction Stop
 
 # Define destination paths
 $BuildDest_Root = $BuildLocation
@@ -430,7 +431,7 @@ Write-Host "`nPlease now navigate to $BuildLocation"
 Write-Host "`nAdd any desired Windows PE Drivers to the WinPE_Drivers folder.`nIf you need help finding drivers, check the ReadMe file in that folder."
 Write-Host "Once you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
 if (!($BuildPath)) {
-    if ($BuildLocation -ne $MurrpToolsScriptPath) {
+    if ($BuildLocation.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
         Write-Host "`nPress any key to open the MurrpTools Build folder..."
         Pause
         Start-Process -FilePath "Explorer.exe" -ArgumentList $BuildLocation
