@@ -39,9 +39,11 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.3-Alpha"
+$MurrpToolsVersion = "v0.1.4-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
+$MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
+$ProjectRootPath = Resolve-Path $(Split-Path $MurrpToolsScriptPath -Parent)
 
 # Function Definitions
 function Log-Error {
@@ -122,16 +124,13 @@ function Copy-MurrpTools {
 }
 
 function Get-BuildLocation {    
-    $parentDir = Split-Path $PSScriptRoot -Parent
-    
     # If the BuildSelf switch is set, use the script directory as the build path
-    if ($BuildSelf) {
-        $BuildPath = $parentDir
+    if ($BuildSelf -eq $true) {
+        $BuildPath = $MurrpToolsScriptPath
     }
 
     # If BuildPath was provided, use it after validation
     if ($BuildPath) {
-
         # Resolve the path to handle relative paths and ensure it's absolute
         try {
             $BuildPath = Resolve-Path $BuildPath -ErrorAction Stop
@@ -147,16 +146,18 @@ function Get-BuildLocation {
         }
         
         # Verify path is not within script directory or subdirectories
-        if ((Resolve-Path $BuildPath).ProviderPath -like "$((Resolve-Path $PSScriptRoot).ProviderPath)*") {
-            Log-Error "Path ($BuildPath) cannot be a subdirectory of the script directory."
+        if (($BuildPath.ProviderPath -match [regex]::Escape(($ProjectRootPath).ProviderPath)) -and ($BuildPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
+            Log-Error "Path ($BuildPath) cannot be a subdirectory of the project directory."
             Script-Exit $false
         }
         
-        if ((Resolve-Path $BuildPath).ProviderPath -ne (Resolve-Path $parentDir).ProviderPath) {
+        if ($BuildPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
+            #Make MurrpTools directory when not using parent directory
+            $BuildPath = Join-Path $BuildPath "MurrpTools"
             #Copy MurrpTools as it's a different location
-            Copy-MurrpTools -SourcePath $PSScriptRoot -DestinationPath $BuildPath
+            Copy-MurrpTools -SourcePath $MurrpToolsScriptPath -DestinationPath $BuildPath
             # Create completion file if location is different from script directory
-            Write-CompletionFile -Path $(Join-Path $BuildPath "MurrpTools")
+            Write-CompletionFile -Path $BuildPath
         }
         
         return $BuildPath
@@ -165,12 +166,12 @@ function Get-BuildLocation {
     # Offer location selection options
     Write-Host "`n`nThis script will copy all dependencies to the MurrpTools project folder, or Murrptools with dependencies installed to a different location." -ForegroundColor Cyan
     Write-Host "`nPlease select one of the options below to prepare MurrpTools for building images."
-    Write-Host "Option 1: Use current location ($PSScriptRoot)"
+    Write-Host "Option 1: Use current location ($MurrpToolsScriptPath)"
     Write-Host "Option 2: Select a different using Folder Picker"
     $choice = Read-Host "`nEnter choice (1 or 2)"
     
     if ($choice -eq "1") {
-        return $PSScriptRoot
+        return $MurrpToolsScriptPath
     }
     elseif ($choice -eq "2") {
         # GUI folder picker
@@ -180,18 +181,38 @@ function Get-BuildLocation {
         $folderBrowser.ShowNewFolderButton = $true
         
         if ($folderBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
-            $selectedPath = $folderBrowser.SelectedPath
             #Sleep for a moment to allow the dialog to close and folder to be created if the user makes a new folder
             Start-Sleep 2
-            
-            if ($selectedPath -ne $PSScriptRoot) {
-                #Copy MurrpTools as it's a different location
-                Copy-MurrpTools -SourcePath $PSScriptRoot -DestinationPath $selectedPath
-                # Create completion file if location is different from script directory
-                Write-CompletionFile -Path $(Join-Path $selectedPath "MurrpTools")
+            #Validate the selected path
+            try {
+                $selectedPath = Resolve-Path $folderBrowser.SelectedPath -ErrorAction Stop
+            } catch {
+                Log-Error "Path does not exist: $selectedPath"
+                Script-Exit $false
+            }
+    
+            # Verify path exists
+            if (-not (Test-Path $selectedPath)) {
+                Log-Error "Specified path does not exist"
+                Script-Exit $false
             }
             
-            return  $(Join-Path $selectedPath "MurrpTools")
+            # Verify path is not within script directory or subdirectories
+            if (($selectedPath.ProviderPath -match [regex]::Escape(($ProjectRootPath).ProviderPath)) -and ($selectedPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
+                Log-Error "Path ($selectedPath) cannot be a subdirectory of the project directory."
+                Script-Exit $false
+            }
+            
+            if ($selectedPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
+                #Make MurrpTools directory when not using parent directory
+                $selectedPath = Join-Path $selectedPath "MurrpTools"
+                #Copy MurrpTools as it's a different location
+                Copy-MurrpTools -SourcePath $MurrpToolsScriptPath -DestinationPath $selectedPath
+                # Create completion file if location is different from script directory
+                Write-CompletionFile -Path $selectedPath
+            }
+            
+            return $selectedPath
         }
         else {
             Log-Warning "Folder selection was cancelled"
@@ -234,7 +255,7 @@ function Copy-Items {
                 }
                 if ($Verbose) { $copyParams['Verbose'] = $true }
                 Copy-Item @copyParams -ErrorAction Stop
-                Write-Host "Copied $Source`nTo $Destination"
+                Write-Host "`nCopied $Source`nTo $Destination"
             }
             catch {
                 Log-Warning "Failed to copy $Source`: $_"
@@ -255,9 +276,9 @@ function Copy-Items {
 
 function Expand-Dependencies {
     param (
-        [string]$7ZipPath = "$parentDir\Dependencies\7-Zip\7-Zip\7z.exe",
-        [string]$ArchivePath = "$parentDir\Dependencies\Dependencies.7z.001",
-        [string]$ExtractTo = "$parentDir\Dependencies"
+        [string]$7ZipPath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\7-Zip\7-Zip\7z.exe"),
+        [string]$ArchivePath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\Dependencies.7z.001"),
+        [string]$ExtractTo = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies")
     )
 
     if (Test-Path $ArchivePath) {
@@ -296,12 +317,10 @@ function Expand-Dependencies {
 }
 
 # Variable Definitions
-$parentDir = Split-Path $PSScriptRoot -Parent
-
 $BuildSource_Root = @(
     "Dependencies\Microsoft\WinPE_ADK\oscdimg.exe",
     "Dependencies\Microsoft\WinPE_ADK\Win11_WinPE_OCs"
-) | ForEach-Object { Join-Path $parentDir $_ }
+) | ForEach-Object { Join-Path $ProjectRootPath $_ }
 
 $BuildSource_ProgramFiles = @(
     "Dependencies\7-Zip\7-Zip",
@@ -316,7 +335,7 @@ $BuildSource_ProgramFiles = @(
     "Dependencies\Wipefile\Wipefile",
     "Dependencies\Mozilla\Firefox",
     "Dependencies\VideoLAN\VLC"
-) | ForEach-Object { Join-Path $parentDir $_ }
+) | ForEach-Object { Join-Path $ProjectRootPath $_ }
 
 $BuildSource_System32 = @(
     "Dependencies\Microsoft\System32\*",
@@ -326,18 +345,18 @@ $BuildSource_System32 = @(
     "Dependencies\Sysinternals\pslist64.exe",
     "Dependencies\Sysinternals\pskill64.exe",
     "Dependencies\Sysinternals\BGInfo\Bginfo64.exe"
-) | ForEach-Object { Join-Path $parentDir $_ }
+) | ForEach-Object { Join-Path $ProjectRootPath $_ }
 
 $BuildSource_DebloatTools = @(
     "Dependencies\PE Network Manager\PENetwork_x64"
-) | ForEach-Object { Join-Path $parentDir $_ }
+) | ForEach-Object { Join-Path $ProjectRootPath $_ }
 
 #Add D.A.R.T components if available
-if (Test-Path "$parentDir\Dependencies\Microsoft\DART") {
+if (Test-Path "$ProjectRootPath\Dependencies\Microsoft\DART") {
     $BuildSource_BootFiles = @(
         "Dependencies\Microsoft\DART\sources",
         "Dependencies\Microsoft\DART\Windows"
-    ) | ForEach-Object { Join-Path $parentDir $_ }
+    ) | ForEach-Object { Join-Path $ProjectRootPath $_ }
 } else {
     $BuildSource_BootFiles = $null
 }
@@ -411,7 +430,7 @@ Write-Host "`nPlease now navigate to $BuildLocation"
 Write-Host "`nAdd any desired Windows PE Drivers to the WinPE_Drivers folder.`nIf you need help finding drivers, check the ReadMe file in that folder."
 Write-Host "Once you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
 if (!($BuildPath)) {
-    if ($BuildLocation -ne $PSScriptRoot) {
+    if ($BuildLocation -ne $MurrpToolsScriptPath) {
         Write-Host "`nPress any key to open the MurrpTools Build folder..."
         Pause
         Start-Process -FilePath "Explorer.exe" -ArgumentList $BuildLocation
