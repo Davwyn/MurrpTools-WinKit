@@ -46,42 +46,47 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 ⚠ **Warning:** This project still being tested. - Use at your own risk. Always backup data before use.
 
 
-1. **Download the Software**
-   **Option 1 - Simple ZIP Download:**
+1. **--Download the Software--**
+   
+   **-Option 1 - Simple ZIP Download-**
    1. Click the green "Code" button at the top of this page
    2. Select "Download ZIP"
    3. Extract the ZIP file to your preferred location (e.g. Desktop)
 
-   **Option 2 - Git Clone (Advanced):**
+   **-Option 2 - Git Clone (For advanced Users)-**
    ```powershell
    git clone https://github.com/Dav-Edward/WinKit-MurrpTools.git
    cd MurrpTools
    ```
 
-2. **Install Dependencies and Stage the building location**
+2. **--Install Dependencies and Stage the building location--**
+   
    **Choose what works for you:**
 
-   🖱️ **Simple Double-Click Method:**
+   🖱️ **-Simple Double-Click Method-**
    1. Go into the MurrpTools folder
    2. Find "1 Dependencies and Staging.cmd" in the folder
    3. You might need to right-click on the file and go into 'Properties'. If there is an 'Unblock' button push it. Otherwise just click OK.
    4. Double-click the file to run it
    5. Click "Yes" if asked for permission
 
-   💻 **PowerShell Method (for advanced users):**
+   💻 **-PowerShell Method (for advanced users)-**
    1. Right-click the Start menu
    2. Select "Windows Terminal (Admin)"
    3. Copy/paste this command:
    ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process
    .\MurrpTools\1_Dependencies_and_Staging.ps1 -BuildSelf
    ```
    or to build in a specific folder:
    ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process
    .\MurrpTools\1_Dependencies_and_Staging.ps1 -BuildPath C:\Build
    ```
    In which you replace C:\Build with the path you'd like to build the project.
 
-3. **Prepare Drivers**
+3. **--Prepare Drivers--**
+   
    **For best compatibility:**
    1. Visit your computer manufacturer's support site:
       - [Dell Drivers](https://www.dell.com/support/kbdoc/en-us/000107478/dell-command-deploy-winpe-driver-packs)
@@ -103,28 +108,34 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
        B --> C[Place in WinPE_Drivers]
    ```
 
-4. **Download Windows Install Media**
+4. **--Download Windows Install Media--**
+   
    Download either ([Official](https://www.microsoft.com/en-us/software-download/windows11) Windows Install Media (Easy) or create a [UUP dump](https://uupdump.net) ISO file (Advanced) and keep it in a easy to find location like your Downloads folder.
 
-5. **Build MurrpTools Media**
+5. **--Build MurrpTools Media--**
+    
    **Choose your method:**
 
-   🖱️ **Easy Method:**
+   🖱️ **-Easy Method-**
    1. Find "2 Build MurrpTools Image.cmd" in the folder
    2. You might need to right-click on the file and go into 'Properties'. If there is an 'Unblock' button push it. Otherwise just click OK.
    3. Right-click the file and select "Run as Administrator"
    4. Follow the prompts, you will be asked for the Windows Install Media ISO file, using the file picker that opens select the ISO file you downloaded earlier.
 
-   💻 **PowerShell Method (Admin):**
+   💻 **-PowerShell Method (For advanced users)-**
+   1. Right-click the Start menu
+   2. Select "Windows Terminal (Admin)"
+   3. Copy/paste this command:
    ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process
    .\MurrpTools\2_Build_MurrpTools_Image.ps1 -IsoPath "C:\path\to\windows.iso"
    ```
 
-6. **Image MurrpTools to Flash Drive**
+6. **--Image MurrpTools to Flash Drive--**
 
-   You can use any ISO to Flash Drive imaging tool you prefer, but here are instructions using Rufus below:
+      You can use any ISO to Flash Drive imaging tool you prefer, but here are instructions using Rufus below:
    
-   **Using Rufus**
+   **-Using Rufus-**
    
    Rufus Tool is available at: https://rufus.ie
    
@@ -134,6 +145,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
       - File system: NTFS
       - *(Unchecked)* Create extended label and icon files.
         You may need to click 'Show Advanced format options' to see all options.
+        
         ![image](https://github.com/user-attachments/assets/fe6ac285-3835-43fa-b6d1-489867a8e463)
   
         After you click 'Start' Rufus may prompt with 'Windows User Experience' (eg. Remove Requirements, Disable Bitlocker, etc.)
@@ -142,11 +154,11 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
         
         ![image](https://github.com/user-attachments/assets/62a82f41-fb74-4ce6-b1f2-ee64dd66b34b)
 
-8. **MurrpTools is ready to be used**
+7. **--MurrpTools is ready to be used--**
    
-   Once your flash drive is imaged using Rufus or your preferred tool, you can now boot off of the flash drive the same way you would a standard Windows Installation media flash drive.
+      Once your flash drive is imaged using Rufus or your preferred tool, you can now boot off of the flash drive the same way you would a standard Windows Installation media flash drive.
 
-   From there you can use MurrpTools as a toolkit for diagnostics, repair, and recovery, or you can click the "Install Windows with MurrpTools" button on the launcher to install Windows with MurrpTools handling various aspects of the setup including offering options to debloat Windows on it's first start up.
+      From there you can use MurrpTools as a toolkit for diagnostics, repair, and recovery, or you can click the "Install Windows with MurrpTools" button on the launcher to install Windows with MurrpTools handling various aspects of the setup including offering options to debloat Windows on it's first start up.
 
    ![image](https://github.com/user-attachments/assets/b3c336a7-7574-48a3-b34f-27bff006d737)
 
