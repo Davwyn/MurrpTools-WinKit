@@ -121,7 +121,11 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    ```
 
 6. **Image MurrpTools to Flash Drive**
+
+   You can use any ISO to Flash Drive imaging tool you prefer, but here are instructions using Rufus below:
+   
    **Using Rufus**
+   
    Rufus Tool is available at: https://rufus.ie
    
    **Reccomended setings for Rufus:**
@@ -130,12 +134,19 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
       - File system: NTFS
       - *(Unchecked)* Create extended label and icon files.
         You may need to click 'Show Advanced format options' to see all options.
-        Note: If Rufus prompts with Windows User Experience (eg. Remove Requirements, Disable Bitlocker, etc.) Please uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools.`nMurrpTools will already include those features built-in.
         ![image](https://github.com/user-attachments/assets/fe6ac285-3835-43fa-b6d1-489867a8e463)
+  
+        After you click 'Start' Rufus may prompt with 'Windows User Experience' (eg. Remove Requirements, Disable Bitlocker, etc.)
+
+        Please uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools.`nMurrpTools will already include those features built-in.
+        
         ![image](https://github.com/user-attachments/assets/62a82f41-fb74-4ce6-b1f2-ee64dd66b34b)
 
-7. **MurrpTools is ready to be used**
-   Once your flash drive is imaged using Rufus or your preferred tool, you can now boot off of the flash drive the same way you would a standard Windows Installation media flash drive. From there you can use MurrpTools as a toolkit for diagnostics, repair, and recovery, or you can click the "Install Windows with Debloat Tools" button on the launcher to install Windows with MurrpTools handling various aspects of the setup including offering options to debloat Windows on it's first start up.
+8. **MurrpTools is ready to be used**
+   
+   Once your flash drive is imaged using Rufus or your preferred tool, you can now boot off of the flash drive the same way you would a standard Windows Installation media flash drive.
+
+   From there you can use MurrpTools as a toolkit for diagnostics, repair, and recovery, or you can click the "Install Windows with Debloat Tools" button on the launcher to install Windows with MurrpTools handling various aspects of the setup including offering options to debloat Windows on it's first start up.
 
    ![image](https://github.com/user-attachments/assets/b3c336a7-7574-48a3-b34f-27bff006d737)
 
