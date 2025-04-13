@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.6-Alpha"
+$MurrpToolsVersion = "v0.1.7-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot

@@ -34,7 +34,7 @@ param (
 )
 
 # Script-level variables
-$MurrpToolsVersion = "v0.1.6-Alpha"
+$MurrpToolsVersion = "v0.1.7-Alpha"
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
 $mountDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "mount"
 $bootMediaDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "BootMedia"
@@ -580,7 +580,7 @@ function Build-MurrpToolsISO {
         if (!(Test-Path $oscdimg)) {
             throw "$oscdimg is missing. Unable to create ISO file."
         }
-        & $oscdimg -bootdata:"2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`"" -o -m -u2 -udfver102 -lMurrpTools "$bootMediaDir" MurrpTools_$MurrpToolsVersion.iso
+        Start-Process -FilePath $oscdimg -ArgumentList "-bootdata:2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`" -o -m -u2 -udfver102 -lMurrpTools_$MurrpToolsVersion `"$bootMediaDir`" `"MurrpTools_$MurrpToolsVersion.iso`"" -Wait -NoNewWindow -ErrorAction Stop
         Write-Host "`nMurrpTools_$MurrpToolsVersion.iso built at $MurrpToolsISOPath`n"
     }
     catch {

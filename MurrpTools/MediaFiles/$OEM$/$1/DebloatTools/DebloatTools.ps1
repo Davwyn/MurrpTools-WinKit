@@ -101,9 +101,10 @@ function Show-ToolDetails {
 
 function Show-NetworkManager {
     Clear-Host
-    Write-Host "`nConfigure network settings and click 'OK' on the configuration window to continue."
+    Write-Host "`nConfigure network settings and click 'OK'."
     Write-Host "`nOpening PE Network Manager..." -ForegroundColor Yellow
-    Start-Process "$PENetworkManagerSource" -ArgumentList "/guidisable=31" -Wait
+    Start-Process "$PENetworkManagerSource" -ArgumentList "/guidisable=31"
+    Start-Sleep -Seconds 5
 }
 
 # Main menu loop
