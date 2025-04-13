@@ -120,6 +120,19 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    .\MurrpTools\2_Build_MurrpTools_Image.ps1 -IsoPath "C:\path\to\windows.iso"
    ```
 
+6. **Image MurrpTools to Flash Drive**
+   **Using Rufus**
+   Rufus Tool is available at: https://rufus.ie
+   
+   **Reccomended setings for Rufus:**
+      Partition scheme: GPT
+      Target System: UEFI
+      File system: NTFS
+      *(Unchecked)* Create extended label and icon files.
+      You may need to click 'Show Advanced format options' to see all options.
+      Note: If Rufus prompts with Windows User Experience (eg. Remove Requirements, Disable Bitlocker, etc.) Please uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools.`nMurrpTools will already include those features built-in.
+
+
 ## Special Thanks
 - **Tiny11 Builder Team** - Provided great resources to understand custom image generation.
 - **UUP Dump Project** - Both useful project in general, and their scripts helped to understand customizing Windows images, as well as building the ISO file.
