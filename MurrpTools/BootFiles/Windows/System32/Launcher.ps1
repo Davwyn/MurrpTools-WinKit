@@ -69,9 +69,8 @@ $QuickLaunch = @(
 $QuickLaunchAdditions = [ordered]@{}
 
 $QuickLaunchAdditions["Bypass Windows 11 Requirements for Generic Setup"] = "Disable-Win11Requirements"
-if ($HarvestDriversSource) {
-    $QuickLaunchAdditions["Harvest Drivers"] = $HarvestDriversSource
-}
+if ($HarvestDriversSource) {$QuickLaunchAdditions["Harvest Drivers"] = $HarvestDriversSource}
+if (Test-Path "$env:SystemRoot\System32\BitLockerUtility.ps1") {$QuickLaunchAdditions["BitLocker Utility"] = "$env:SystemRoot\System32\BitLockerUtility.ps1"}
 $QuickLaunchAdditions["Notepad"] = "notepad.exe"
 $QuickLaunchAdditions["Maximize This Menu"] = "Maximize-Window"
 $QuickLaunchAdditions["Window This Menu"] = "Restore-Window"

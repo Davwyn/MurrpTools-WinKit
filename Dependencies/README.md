@@ -29,6 +29,22 @@ Original Website (no longer valid): http://www.chall.plus.com/winpe/
 
 https://alternativeto.net/software/chkdsk-gui/about/
 
+Dependencies README.md
+
+# cmartinezone
+
+GitHub user that makes useful PE Scripts
+
+Author Website: https://github.com/cmartinezone
+
+Author: Carlos Martinez
+
+## BitLockerUtility
+
+Windows PE compatible PowerShell script to manage Bitlocker volumes.
+
+Website: https://github.com/cmartinezone/BitLockerUtility
+
 # CPUID
 
 ## CPU-Z

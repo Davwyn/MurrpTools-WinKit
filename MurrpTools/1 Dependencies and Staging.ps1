@@ -42,8 +42,8 @@ param (
 $MurrpToolsVersion = "v0.1.7-Alpha"
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
-$MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
-$ProjectRootPath = Resolve-Path $(Split-Path $MurrpToolsScriptPath -Parent)
+$MurrpToolsScriptPath = Resolve-Path $PSScriptRoot -ErrorAction Stop
+$ProjectRootPath = $(Split-Path $MurrpToolsScriptPath -Parent)
 
 # Function Definitions
 function Log-Error {
@@ -146,7 +146,7 @@ function Get-BuildLocation {
         }
         
         # Verify path is not within script directory or subdirectories
-        if (($BuildPath.ProviderPath -match [regex]::Escape(($ProjectRootPath).ProviderPath)) -and ($BuildPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
+        if (($BuildPath.ProviderPath -match [regex]::Escape($ProjectRootPath) -and ($BuildPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
             Log-Error "Path ($BuildPath) cannot be a subdirectory of the project directory."
             Script-Exit $false
         }
@@ -198,7 +198,7 @@ function Get-BuildLocation {
             }
             
             # Verify path is not within script directory or subdirectories
-            if (($selectedPath.ProviderPath -match [regex]::Escape(($ProjectRootPath).ProviderPath)) -and ($selectedPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
+            if (($selectedPath.ProviderPath -match [regex]::Escape($ProjectRootPath)) -and ($selectedPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
                 Log-Error "Path ($selectedPath) cannot be a subdirectory of the project directory."
                 Script-Exit $false
             }
@@ -275,11 +275,9 @@ function Copy-Items {
 }
 
 function Expand-Dependencies {
-    param (
-        [string]$7ZipPath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\7-Zip\7-Zip\7z.exe"),
-        [string]$ArchivePath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\Dependencies.7z.001"),
-        [string]$ExtractTo = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies")
-    )
+    $7ZipPath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\7-Zip\7-Zip\7z.exe"),
+    $ArchivePath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\Dependencies.7z.001"),
+    $ExtractTo = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies")
 
     if (Test-Path $ArchivePath) {
         Write-Host "`nThe dependencies have not yet been extracted. Press enter to extract them now." -ForegroundColor Yellow
@@ -345,7 +343,8 @@ $BuildSource_System32 = @(
     "Dependencies\LaunchBar\LaunchBar_x64.exe",
     "Dependencies\Sysinternals\pslist64.exe",
     "Dependencies\Sysinternals\pskill64.exe",
-    "Dependencies\Sysinternals\BGInfo\Bginfo64.exe"
+    "Dependencies\Sysinternals\BGInfo\Bginfo64.exe",
+    "Dependencies\CMartinezone\BitLockerUtility\BitLockerUtility.ps1"
 ) | ForEach-Object { Join-Path $ProjectRootPath $_ }
 
 $BuildSource_DebloatTools = @(

@@ -395,7 +395,9 @@ function Add-Packages {
         "en-us\WinPE-DismCmdlets_en-us.cab",
         "WinPE-SecureBootCmdlets.cab",
         "WinPE-StorageWMI.cab",
-        "en-us\WinPE-StorageWMI_en-us.cab"
+        "en-us\WinPE-StorageWMI_en-us.cab",
+        "WinPE-HTA.cab",
+        "en-us\WinPE-HTA_en-us.cab"
     )
     
     foreach ($package in $packages) {
