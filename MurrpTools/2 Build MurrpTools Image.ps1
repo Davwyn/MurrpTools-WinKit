@@ -34,7 +34,7 @@ param (
 )
 
 # Script-level variables
-$MurrpToolsVersion = "v0.1.7-Alpha"
+$MurrpToolsVersion = "v0.1.8-Alpha"
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
 $mountDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "mount"
 $bootMediaDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "BootMedia"
@@ -44,6 +44,7 @@ $Script:errorLog = @()
 $Script:warningLog = @()
 $Script:ISOmountResult = $null
 $Script:ISOdriveLetter = $null
+$verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
 function Log-Error {
     param($message)
@@ -100,7 +101,7 @@ function Cleanup {
     foreach ($folder in $folders) {
         if (Test-Path $folder) {
             try {
-                Remove-Item $folder -Recurse -Force
+                Remove-Item $folder -Recurse -Force -Verbose:$verbose
                 Write-Host "Cleaned up folder: $folder"
             } catch {
                 Log-Error "Failed to remove $folder - please delete manually"
@@ -129,7 +130,7 @@ function Test-Admin {
 function Initialize-Directories {    
     try {
         # Create mount directory at script location
-        New-Item -ItemType Directory -Path "$MurrpToolsScriptPath\mount" -ErrorAction Stop | Out-Null
+        New-Item -ItemType Directory -Path "$MurrpToolsScriptPath\mount" -ErrorAction Stop -Verbose:$verbose | Out-Null
         Write-Host "Mount directory created successfully."
     }
     catch {
@@ -230,11 +231,11 @@ function Copy-WithProgress {
             # Ensure the destination directory exists
             $destinationDir = Split-Path $destinationFile -Parent
             if (-not (Test-Path $destinationDir)) {
-                New-Item -ItemType Directory -Path $destinationDir -Force | Out-Null
+                New-Item -ItemType Directory -Path $destinationDir -Force -Verbose:$verbose | Out-Null
             }
 
             # Copy the file
-            Copy-Item -Path $file.FullName -Destination $destinationFile -Force
+            Copy-Item -Path $file.FullName -Destination $destinationFile -Force -Verbose:$verbose
 
             # Update progress
             Write-Progress -Activity "Copying files..." `
@@ -299,7 +300,7 @@ function Build-Image {
         # Create BootMedia folder
         Write-Host "Creating BootMedia directory"
         if (-not (Test-Path $bootMediaDir)) {
-            New-Item -ItemType Directory -Path $bootMediaDir | Out-Null
+            New-Item -ItemType Directory -Path $bootMediaDir -Verbose:$verbose | Out-Null
         }
 
         # Copy entire ISO contents to BootMedia
@@ -356,7 +357,7 @@ function Add-Customizations {
                 takeown /F $destPath /A >$null
                 icacls $destPath /grant Administrators:F >$null
             }
-            Copy-Item $_.FullName $destPath -Force
+            Copy-Item $_.FullName $destPath -Force -Verbose:$verbose
         }
         
         Write-Host "`nCustomizations added successfully."
@@ -440,7 +441,7 @@ function Add-Drivers {
     Write-Host "`nAdding Windows PE Drivers provided by user..."
     #Rename any Autorun.inf file to Autorun.inf.disabled to prevent Add-WindowsDriver from failing
     Get-ChildItem -Path $driversDir -Recurse -Filter "Autorun.inf" | ForEach-Object {
-        Rename-Item -Path $_.FullName -NewName "Autorun.inf.disabled" -Force
+        Rename-Item -Path $_.FullName -NewName "Autorun.inf.disabled" -Force -Verbose:$verbose
     }
     # Add drivers to the mounted WIM
     try {
@@ -494,7 +495,7 @@ function Add-MediaFiles {
                 takeown /F $destPath /A >$null
                 icacls $destPath /grant Administrators:F >$null
             }
-            Copy-Item $_.FullName $destPath -Force
+            Copy-Item $_.FullName $destPath -Force -Verbose:$verbose
         }        
         Write-Host "`nMurrpTools media files added successfully."
     }
@@ -519,7 +520,7 @@ function Add-DebloatTools {
     }
 
     if (-not (Test-Path $setupDir)) {
-        New-Item -ItemType Directory -Path $setupDir -Force | Out-Null
+        New-Item -ItemType Directory -Path $setupDir -Force -Verbose:$verbose | Out-Null
     }
 
     try {
@@ -546,13 +547,13 @@ function Add-DebloatTools {
                     Write-Warning "Downloaded script for $toolName is not a valid PowerShell script"
                     $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
                     if (Test-Path $toolScriptPath) {
-                        Remove-Item $toolScriptPath -Force
+                        Remove-Item $toolScriptPath -Force -Verbose:$verbose
                     }
                 }
             } catch {
                 Log-Warning "Failed to download or validate script for $toolName`: $_"
                 if (Test-Path $toolScriptPath) {
-                    Remove-Item $toolScriptPath -Force
+                    Remove-Item $toolScriptPath -Force -Verbose:$verbose
                 }
                 $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
             }
@@ -577,12 +578,12 @@ function Build-MurrpToolsISO {
         $MurrpToolsISOPath = Join-Path $MurrpToolsScriptPath "MurrpTools.iso"
         if (Test-Path $MurrpToolsISOPath) { 
             Write-Host "Removing existing MurrpTools.iso file"
-            Remove-Item $MurrpToolsISOPath -Force -ErrorAction Stop
+            Remove-Item $MurrpToolsISOPath -Force -ErrorAction Stop -Verbose:$verbose
         }
         if (!(Test-Path $oscdimg)) {
             throw "$oscdimg is missing. Unable to create ISO file."
         }
-        Start-Process -FilePath $oscdimg -ArgumentList "-bootdata:2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`" -o -m -u2 -udfver102 -lMurrpTools_$MurrpToolsVersion `"$bootMediaDir`" `"MurrpTools_$MurrpToolsVersion.iso`"" -Wait -NoNewWindow -ErrorAction Stop
+        Start-Process -FilePath $oscdimg -ArgumentList "-bootdata:2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`" -o -m -u2 -udfver102 -lMurrpTools_$MurrpToolsVersion `"$bootMediaDir`" `"MurrpTools_$MurrpToolsVersion.iso`"" -Wait -NoNewWindow -ErrorAction Stop -Verbose:$verbose
         Write-Host "`nMurrpTools_$MurrpToolsVersion.iso built at $MurrpToolsISOPath`n"
     }
     catch {

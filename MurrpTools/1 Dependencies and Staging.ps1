@@ -39,11 +39,53 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.7-Alpha"
+$MurrpToolsVersion = "v0.1.8-Alpha"
+
+$verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
+
+function Get-UNCPath {
+    param (
+        [string]$Path
+    )
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return $Path  # Return as-is if null or empty
+    }
+    if ($Path -notmatch '^\\\\\?\\') {
+        Write-Verbose "Converting to UNC path: $Path"
+        return "\\?\$([System.IO.Path]::GetFullPath($Path))"
+    }
+    Write-Verbose "Already a UNC path: $Path" -ForegroundColor Magenta
+    return $Path  # Return as-is if already a UNC path
+}
+
+function Join-UNCPath {
+    param (
+        [string]$Path1,
+        [string]$Path2
+    )
+    try {
+        $CombinedPath = [System.IO.Path]::Combine($Path1,$Path2)
+        return $CombinedPath
+    } catch {
+        Log-Error "Failed to combine paths: $_"
+        Script-Exit $false
+    }
+}
+
+# Normalize paths for accurate comparison, removing \\?\ prefix if present
+function Get-NormalizedPath {
+    param ([string]$Path)
+    if ($Path -like "\\?\*") {
+        $NewPath = $Path.Substring(4) # Remove \\?\ prefix
+        return [System.IO.Path]::GetFullPath($NewPath.TrimEnd('\'))  # Remove trailing backslashes
+    }
+    return [System.IO.Path]::GetFullPath($Path.TrimEnd('\'))  # Remove trailing backslashes
+}
+
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
-$MurrpToolsScriptPath = Resolve-Path $PSScriptRoot -ErrorAction Stop
-$ProjectRootPath = $(Split-Path $MurrpToolsScriptPath -Parent)
+$MurrpToolsScriptPath = Resolve-Path (Get-UNCPath $PSScriptRoot) -ErrorAction Stop
+$ProjectRootPath = Split-Path $MurrpToolsScriptPath.ProviderPath -Parent
 
 # Function Definitions
 function Log-Error {
@@ -88,9 +130,9 @@ function Write-CompletionFile {
     param (
         [string]$Path
     )
-    $completionFile = Join-Path $Path "1 Dependencies and Staging Complete.txt"
+    $completionFile = Join-UNCPath $Path "1 Dependencies and Staging Complete.txt"
     if (!(Test-Path $Path)) {
-        New-Item -ItemType Directory -Path $Path -ErrorAction Stop | Out-Null
+        New-Item -ItemType Directory -Path $Path -ErrorAction Stop -Verbose:$verbose | Out-Null
     }
     "Dependencies and Staging step is already complete." | Out-File $completionFile
 }
@@ -102,17 +144,17 @@ function Copy-MurrpTools {
         [bool]$Verbose = $false
     )
     
-    $copyParams = @{
-        Path = "$SourcePath"
+        $copyParams = @{
+        LiteralPath = "$SourcePath"
         Destination = $DestinationPath
         Recurse = $true
         Force = $true
         Exclude = $ScriptFileName,"1 Dependencies and Staging.cmd"
+        Verbose = $verbose
     }
-    if ($Verbose) { $copyParams['Verbose'] = $true }
     
     try {
-        Write-Host "`nCopying MurrpTools folder to $DestinationPath (excluding $ScriptFileName)..." -ForegroundColor Yellow
+        Write-Host "`nCopying MurrpTools folder from $SourcePath to $DestinationPath (excluding $ScriptFileName)..." -ForegroundColor Yellow
         Copy-Item @copyParams -ErrorAction Stop
         Write-Host "`nMurrpTools folder copied." -ForegroundColor Green
     }
@@ -123,10 +165,48 @@ function Copy-MurrpTools {
     }
 }
 
+function Select-BuildLocation {
+    param (
+        $BuildPath
+    )
+    
+    if ($BuildPath.ProviderPath -match '^\\\\\?\\') {
+        Log-Error "UNC paths (starting with \\?\) are not supported for the second building phase. Please select a different path."
+        Script-Exit $false
+    }
+    
+    # Check if Long Path support is enabled
+    $longPathEnabled = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -ErrorAction SilentlyContinue).LongPathsEnabled -eq 1
+
+    if (-not $longPathEnabled) {
+        $maxAllowedLength = 260 - 152
+        if ($($BuildPath.ProviderPath.Length) -gt $maxAllowedLength) {
+            Log-Error "The selected path is too long. Windows Long Path support is not enabled, and the total path length exceeds the allowed limit of $maxAllowedLength characters. Please enable Long Path support in Windows or select a shorter folder path.`nYou can enable Long Path Support in PowerShell as administrator by typing:`nSet-ItemProperty -Path `"HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem`" -Name `"LongPathsEnabled`" -Value 1 -PropertyType DWORD -Force`nand then restarting the computer."
+            Script-Exit $false
+        }
+    }
+
+    # Verify path is not within script directory or subdirectories
+    if (($(Get-NormalizedPath $BuildPath.ProviderPath) -match [regex]::Escape($(Get-NormalizedPath $ProjectRootPath))) -and ($(Get-NormalizedPath $BuildPath.ProviderPath) -ne $(Get-NormalizedPath $MurrpToolsScriptPath.ProviderPath))) {
+        Log-Error "Path ($BuildPath) cannot be a subdirectory of the project directory."
+        Script-Exit $false
+    }
+    
+    if ($(Get-NormalizedPath $BuildPath.ProviderPath) -ne $(Get-NormalizedPath $MurrpToolsScriptPath.ProviderPath)) {
+        # Make MurrpTools directory when not using parent directory
+        $BuildPath = Join-UNCPath $BuildPath.ProviderPath "MurrpTools"
+        # Copy MurrpTools as it's a different location
+        Copy-MurrpTools -SourcePath $MurrpToolsScriptPath.ProviderPath -DestinationPath $BuildPath
+        # Create completion file if location is different from script directory
+        Write-CompletionFile -Path $BuildPath
+    }
+}
+
 function Get-BuildLocation {    
     # If the BuildSelf switch is set, use the script directory as the build path
     if ($BuildSelf -eq $true) {
-        $BuildPath = $MurrpToolsScriptPath
+        $BuildPath = $PSScriptRoot
+        Write-Host "`nUsing current location: $BuildPath" -ForegroundColor Green
     }
 
     # If BuildPath was provided, use it after validation
@@ -139,26 +219,7 @@ function Get-BuildLocation {
             Script-Exit $false
         }
 
-        # Verify path exists
-        if (-not (Test-Path $BuildPath)) {
-            Log-Error "Specified path does not exist"
-            Script-Exit $false
-        }
-        
-        # Verify path is not within script directory or subdirectories
-        if (($BuildPath.ProviderPath -match [regex]::Escape($ProjectRootPath) -and ($BuildPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
-            Log-Error "Path ($BuildPath) cannot be a subdirectory of the project directory."
-            Script-Exit $false
-        }
-        
-        if ($BuildPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
-            #Make MurrpTools directory when not using parent directory
-            $BuildPath = Join-Path $BuildPath "MurrpTools"
-            #Copy MurrpTools as it's a different location
-            Copy-MurrpTools -SourcePath $MurrpToolsScriptPath -DestinationPath $BuildPath
-            # Create completion file if location is different from script directory
-            Write-CompletionFile -Path $BuildPath
-        }
+        Select-BuildLocation $BuildPath
         
         return $BuildPath
     }
@@ -181,38 +242,19 @@ function Get-BuildLocation {
         $folderBrowser.ShowNewFolderButton = $true
         
         if ($folderBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
-            #Sleep for a moment to allow the dialog to close and folder to be created if the user makes a new folder
+            # Sleep for a moment to allow the dialog to close and folder to be created if the user makes a new folder
             Start-Sleep 2
-            #Validate the selected path
+            # Validate the selected path
             try {
-                $selectedPath = Resolve-Path $folderBrowser.SelectedPath -ErrorAction Stop
+                $BuildPath = Resolve-Path $folderBrowser.SelectedPath -ErrorAction Stop
             } catch {
-                Log-Error "Path does not exist: $selectedPath"
+                Log-Error "Path does not exist: $BuildPath"
                 Script-Exit $false
             }
-    
-            # Verify path exists
-            if (-not (Test-Path $selectedPath)) {
-                Log-Error "Specified path does not exist"
-                Script-Exit $false
-            }
+
+            Select-BuildLocation $BuildPath
             
-            # Verify path is not within script directory or subdirectories
-            if (($selectedPath.ProviderPath -match [regex]::Escape($ProjectRootPath)) -and ($selectedPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath)) {
-                Log-Error "Path ($selectedPath) cannot be a subdirectory of the project directory."
-                Script-Exit $false
-            }
-            
-            if ($selectedPath.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
-                #Make MurrpTools directory when not using parent directory
-                $selectedPath = Join-Path $selectedPath "MurrpTools"
-                #Copy MurrpTools as it's a different location
-                Copy-MurrpTools -SourcePath $MurrpToolsScriptPath -DestinationPath $selectedPath
-                # Create completion file if location is different from script directory
-                Write-CompletionFile -Path $selectedPath
-            }
-            
-            return $selectedPath
+            return $BuildPath
         }
         else {
             Log-Warning "Folder selection was cancelled"
@@ -232,10 +274,10 @@ function Copy-Items {
         [bool]$Verbose = $false
     )
     
-    # Create destination directory if it doesn't exist
+        # Create destination directory if it doesn't exist
     try {
         if (-not (Test-Path $Destination)) {
-            New-Item -ItemType Directory -Path $Destination -ErrorAction Stop | Out-Null
+            New-Item -ItemType Directory -Path $Destination -ErrorAction Stop -Verbose:$verbose | Out-Null
         }
     }
     catch {
@@ -248,12 +290,12 @@ function Copy-Items {
         if (Test-Path $Source) {
             try {
                 $copyParams = @{
-                    Path = $Source
+                    LiteralPath = $Source
                     Destination = $Destination
                     Recurse = $true
                     Force = $true
+                    Verbose = $verbose
                 }
-                if ($Verbose) { $copyParams['Verbose'] = $true }
                 Copy-Item @copyParams -ErrorAction Stop
                 Write-Host "`nCopied $Source`nTo $Destination"
             }
@@ -275,8 +317,8 @@ function Copy-Items {
 }
 
 function Expand-Dependencies {
-    $7ZipPath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\7-Zip\7-Zip\7z.exe"),
-    $ArchivePath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\Dependencies.7z.001"),
+    $7ZipPath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\7-Zip\7-Zip\7z.exe")
+    $ArchivePath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\Dependencies.7z.001")
     $ExtractTo = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies")
 
     if (Test-Path $ArchivePath) {
@@ -292,13 +334,13 @@ function Expand-Dependencies {
         }
         try {
             # Run 7-Zip to extract the archive using Start-Process with -PassThru
-            $process = Start-Process -FilePath $7ZipPath -ArgumentList "x `"$ArchivePath`" -o`"$ExtractTo`" -y" -NoNewWindow -Wait -PassThru
+            $process = Start-Process -FilePath $7ZipPath -ArgumentList "x `"$ArchivePath`" -o`"$ExtractTo`" -y" -NoNewWindow -Wait -PassThru -Verbose:$verbose
             if ($process.ExitCode -eq 0) {
                 Write-Host "`nExtraction completed successfully." -ForegroundColor Green
 
                 # Delete all matching archive parts
-                Get-ChildItem -Path $ExtractTo -Filter "Dependencies.7z.*" | ForEach-Object {
-                    Remove-Item -Path $_.FullName -Force
+                Get-ChildItem -LiteralPath $ExtractTo -Filter "Dependencies.7z.*" | ForEach-Object {
+                    Remove-Item -LiteralPath $_.FullName -Force -Verbose:$verbose
                 }
                 Write-Host "`nCleaned up dependency archives." -ForegroundColor Green
             } else {
@@ -319,7 +361,7 @@ $BuildSource_Root = @(
     "Dependencies\Microsoft\WinPE_ADK\oscdimg.exe",
     "Dependencies\Microsoft\WinPE_ADK\Win11_WinPE_OCs",
     "Dependencies\Microsoft\WinPE_ADK\Win10_WinPE_OCs"
-) | ForEach-Object { Join-Path $ProjectRootPath $_ }
+) | ForEach-Object { Join-UNCPath $ProjectRootPath $_ }
 
 $BuildSource_ProgramFiles = @(
     "Dependencies\7-Zip\7-Zip",
@@ -334,7 +376,7 @@ $BuildSource_ProgramFiles = @(
     "Dependencies\Wipefile\Wipefile",
     "Dependencies\Mozilla\Firefox",
     "Dependencies\VideoLAN\VLC"
-) | ForEach-Object { Join-Path $ProjectRootPath $_ }
+) | ForEach-Object { Join-UNCPath $ProjectRootPath $_ }
 
 $BuildSource_System32 = @(
     "Dependencies\Microsoft\System32\*",
@@ -345,18 +387,18 @@ $BuildSource_System32 = @(
     "Dependencies\Sysinternals\pskill64.exe",
     "Dependencies\Sysinternals\BGInfo\Bginfo64.exe",
     "Dependencies\CMartinezone\BitLockerUtility\BitLockerUtility.ps1"
-) | ForEach-Object { Join-Path $ProjectRootPath $_ }
+) | ForEach-Object { Join-UNCPath $ProjectRootPath $_ }
 
 $BuildSource_DebloatTools = @(
     "Dependencies\PE Network Manager\PENetwork_x64"
-) | ForEach-Object { Join-Path $ProjectRootPath $_ }
+) | ForEach-Object { Join-UNCPath $ProjectRootPath $_ }
 
-#Add D.A.R.T components if available
+# Add D.A.R.T components if available
 if (Test-Path "$ProjectRootPath\Dependencies\Microsoft\DART") {
     $BuildSource_BootFiles = @(
         "Dependencies\Microsoft\DART\sources",
         "Dependencies\Microsoft\DART\Windows"
-    ) | ForEach-Object { Join-Path $ProjectRootPath $_ }
+    ) | ForEach-Object { Join-UNCPath $ProjectRootPath $_ }
 } else {
     $BuildSource_BootFiles = $null
 }
@@ -369,7 +411,7 @@ Write-Host "MurrpTools Dependencies and Staging" -ForegroundColor Green
 Write-Host "Version: $MurrpToolsVersion" -ForegroundColor Green
 Write-Host $border -ForegroundColor Cyan
 
-#Extract dependencies if they are not already extracted
+# Extract dependencies if they are not already extracted
 Expand-Dependencies
 
 Write-Host "`nValidating expected files..." -ForegroundColor Yellow
@@ -394,20 +436,18 @@ if ($missingPaths.Count -gt 0) {
 
 # Get build location
 $BuildLocation = Get-BuildLocation
-$BuildLocation = Resolve-Path $BuildLocation -ErrorAction Stop
 
 # Define destination paths
 $BuildDest_Root = $BuildLocation
-$BuildDest_ProgramFiles = Join-Path $BuildLocation "BootFiles\Program Files\"
-$BuildDest_System32 = Join-Path $BuildLocation "BootFiles\Windows\System32\"
-$BuildDest_DebloatTools = Join-Path $BuildLocation "MediaFiles\`$OEM`$\`$1\DebloatTools"
-$BuildDest_BootFiles = Join-Path $BuildLocation "BootFiles\"
+$BuildDest_ProgramFiles = Join-UNCPath $BuildLocation "BootFiles\Program Files\"
+$BuildDest_System32 = Join-UNCPath $BuildLocation "BootFiles\Windows\System32\"
+$BuildDest_DebloatTools = Join-UNCPath $BuildLocation "MediaFiles\`$OEM`$\`$1\DebloatTools"
+$BuildDest_BootFiles = Join-UNCPath $BuildLocation "BootFiles\"
 
 # Execute the copy operations
 Write-Host "`nCopying dependencies..." -ForegroundColor Yellow
 
 try {
-    $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
     # Copy root items
     Copy-Items -Destination $BuildDest_Root -SourcePaths $BuildSource_Root -Verbose:$verbose -ErrorAction Stop    
     # Copy custom program files
@@ -434,7 +474,7 @@ if (!($BuildPath)) {
     if ($BuildLocation.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
         Write-Host "`nPress any key to open the MurrpTools Build folder..."
         Pause
-        Start-Process -FilePath "Explorer.exe" -ArgumentList $BuildLocation
+        Start-Process -FilePath "Explorer.exe" -ArgumentList $BuildLocation.ProviderPath
         Script-Exit $true
     } else {
         Script-Exit $true
