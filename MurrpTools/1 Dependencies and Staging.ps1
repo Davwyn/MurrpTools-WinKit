@@ -64,7 +64,7 @@ function Join-UNCPath {
         [string]$Path2
     )
     try {
-        $CombinedPath = [System.IO.Path]::Combine($Path1,$Path2)
+        $CombinedPath = [System.IO.Path]::Combine($Path1,$Path2) #Must use this instead of Join-Path because Microsoft PowerShell's internal commands are garbage.
         return $CombinedPath
     } catch {
         Log-Error "Failed to combine paths: $_"
@@ -227,7 +227,7 @@ function Get-BuildLocation {
     # Offer location selection options
     Write-Host "`n`nThis script will copy all dependencies to the MurrpTools project folder, or Murrptools with dependencies installed to a different location." -ForegroundColor Cyan
     Write-Host "`nPlease select one of the options below to prepare MurrpTools for building images."
-    Write-Host "Option 1: Use current location ($MurrpToolsScriptPath)"
+    Write-Host "Option 1: Use current location ($(Get-NormalizedPath $MurrpToolsScriptPath.ProviderPath))"
     Write-Host "Option 2: Select a different using Folder Picker"
     $choice = Read-Host "`nEnter choice (1 or 2)"
     
@@ -467,7 +467,7 @@ try {
 
 Write-Host "`nCopy operations completed. Review any warnings above if any.`n" -ForegroundColor Green
 Write-Host $border -ForegroundColor Cyan
-Write-Host "`nPlease now navigate to $BuildLocation"
+Write-Host "`nPlease now navigate to $(Get-NormalizedPath $BuildLocation.ProviderPath)"
 Write-Host "`nAdd any desired Windows PE Drivers to the WinPE_Drivers folder.`nIf you need help finding drivers, check the ReadMe file in that folder."
 Write-Host "Once you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
 if (!($BuildPath)) {
