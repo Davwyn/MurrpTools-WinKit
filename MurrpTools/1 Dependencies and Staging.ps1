@@ -146,7 +146,7 @@ function Copy-MurrpTools {
     
         $copyParams = @{
         LiteralPath = "$SourcePath"
-        Destination = $DestinationPath
+        Destination = "$DestinationPath\"
         Recurse = $true
         Force = $true
         Exclude = $ScriptFileName,"1 Dependencies and Staging.cmd"
@@ -200,6 +200,7 @@ function Select-BuildLocation {
         # Create completion file if location is different from script directory
         Write-CompletionFile -Path $BuildPath
     }
+    return Resolve-Path $BuildPath
 }
 
 function Get-BuildLocation {    
@@ -219,13 +220,13 @@ function Get-BuildLocation {
             Script-Exit $false
         }
 
-        Select-BuildLocation $BuildPath
+        $BuildPath = Select-BuildLocation $BuildPath
         
         return $BuildPath
     }
     
     # Offer location selection options
-    Write-Host "`n`nThis script will copy all dependencies to the MurrpTools project folder, or Murrptools with dependencies installed to a different location." -ForegroundColor Cyan
+    Write-Host "`n`nThis script will copy all dependencies to the MurrpTools project folder, or MurrpTools with dependencies installed to a different location." -ForegroundColor Cyan
     Write-Host "`nPlease select one of the options below to prepare MurrpTools for building images."
     Write-Host "Option 1: Use current location ($(Get-NormalizedPath $MurrpToolsScriptPath.ProviderPath))"
     Write-Host "Option 2: Select a different using Folder Picker"
@@ -252,7 +253,7 @@ function Get-BuildLocation {
                 Script-Exit $false
             }
 
-            Select-BuildLocation $BuildPath
+            $BuildPath = Select-BuildLocation $BuildPath
             
             return $BuildPath
         }
@@ -291,7 +292,7 @@ function Copy-Items {
             try {
                 $copyParams = @{
                     LiteralPath = $Source
-                    Destination = $Destination
+                    Destination = "$Destination\"
                     Recurse = $true
                     Force = $true
                     Verbose = $verbose
