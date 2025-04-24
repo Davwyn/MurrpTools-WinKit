@@ -652,7 +652,7 @@ try {
     Write-Host "Look for the MurrpTools.iso file located at:`n  $MurrpToolsScriptPath" -ForegroundColor Green
     Write-Host "Use a tool such as Rufus to deploy the ISO image to your flash drive`." -ForegroundColor Green
     Write-Host "Rufus: https://rufus.ie" -ForegroundColor Green
-    Write-Host "`n*Reccomended setings for Rufus:`n  Partition scheme: GPT`n  Target System: UEFI`n  File system: NTFS`n  (Unchecked) Create extended label and icon files.`nYou may need to click 'Show Advanced format options' to see all options." -ForegroundColor DarkMagenta
+    Write-Host "`n*Reccomended setings for Rufus:`n  Partition scheme: GPT`n  Target System: UEFI`n  File system: NTFS`n  (Unchecked) Create extended label and icon files.`nYou may need to click 'Show Advanced format options' to see all options." -ForegroundColor Magenta
     Write-Host "`nNote: If Rufus prompts with Windows User Experience (eg. Remove Requirements, Disable Bitlocker, etc.)`nPlease uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools.`nMurrpTools will already include those features built-in." -ForegroundColor Yellow
     Write-Host $border -ForegroundColor Cyan
     Write-Host ""
