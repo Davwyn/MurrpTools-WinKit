@@ -113,6 +113,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    Download either ([Official](https://www.microsoft.com/en-us/software-download/windows11) Windows Install Media (Easy) or create a [UUP dump](https://uupdump.net) ISO file (Advanced) and keep it in a easy to find location like your Downloads folder.
 
 5. **--Select Desired Debloat Tools (Optional)--**
+
    Inside of the MurrpTools folder is a file called DebloatTools.json which contains a list of available debloat tools you can build into MurrpTools.
    To make changes on desired debloat tools:
    1. Open the DebloatTools.json file in Notepad or some other basic text editor of your choice.
@@ -182,3 +183,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
   - Sky (Skybox Monster)
   - Lord Flame Stryke
   - Kehvarl
+
+## Message to Debloat Tool Developers
+If you are interested in adding your Debloat Tool to MurrpTools, please read the "Developers of Debloat Tools ReadMe.md" file in this repo.
+
+You can either send a Pull Request to edit DebloatTools.json, or open an Issue supplying all of the details of your debloat tool to be included.
