@@ -146,7 +146,7 @@ function Copy-MurrpTools {
     
         $copyParams = @{
         LiteralPath = "$SourcePath"
-        Destination = "$DestinationPath\"
+        Destination = $DestinationPath.TrimEnd('\') + '\'
         Recurse = $true
         Force = $true
         Exclude = $ScriptFileName,"1 Dependencies and Staging.cmd"
@@ -292,7 +292,7 @@ function Copy-Items {
             try {
                 $copyParams = @{
                     LiteralPath = $Source
-                    Destination = "$Destination\"
+                    Destination = $Destination.TrimEnd('\') + '\'
                     Recurse = $true
                     Force = $true
                     Verbose = $verbose
@@ -311,9 +311,8 @@ function Copy-Items {
     }
     
     if ($CopyErrors.Count -gt 0) {
-        Log-Warning "WARNING: Errors occurred during copying:"
-        $CopyErrors
-        Log-Warning "------`nAbove source files had issues and could not be copied!"
+        Log-Error "WARNING: Errors occurred during copying:`n$CopyErrors"
+        Write-Host "------`nAbove source files had issues and could not be copied!"
     }
 }
 
@@ -440,10 +439,10 @@ $BuildLocation = Get-BuildLocation
 
 # Define destination paths
 $BuildDest_Root = $BuildLocation
-$BuildDest_ProgramFiles = Join-UNCPath $BuildLocation "BootFiles\Program Files\"
-$BuildDest_System32 = Join-UNCPath $BuildLocation "BootFiles\Windows\System32\"
+$BuildDest_ProgramFiles = Join-UNCPath $BuildLocation "BootFiles\Program Files"
+$BuildDest_System32 = Join-UNCPath $BuildLocation "BootFiles\Windows\System32"
 $BuildDest_DebloatTools = Join-UNCPath $BuildLocation "MediaFiles\`$OEM`$\`$1\DebloatTools"
-$BuildDest_BootFiles = Join-UNCPath $BuildLocation "BootFiles\"
+$BuildDest_BootFiles = Join-UNCPath $BuildLocation "BootFiles"
 
 # Execute the copy operations
 Write-Host "`nCopying dependencies..." -ForegroundColor Yellow
