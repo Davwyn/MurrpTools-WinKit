@@ -1,6 +1,4 @@
 # Position Window code
-$host.UI.RawUI.WindowTitle = "MurrpTools Launcher"
-
 # Load the required assembly for screen dimensions
 Add-Type -AssemblyName System.Windows.Forms
 
@@ -147,7 +145,7 @@ function Show-Menu {
         [array]$MenuItems,
         [string]$BackOption = ""
     )
-
+    $host.UI.RawUI.WindowTitle = "MurrpTools Launcher"
     Clear-Host
     Write-Host $Header -ForegroundColor Green
     Write-Host "====================" -ForegroundColor Cyan
