@@ -34,7 +34,7 @@ param (
 )
 
 # Script-level variables
-$MurrpToolsVersion = "v0.1.9-Alpha"
+$MurrpToolsVersion = "v0.1.10-Alpha"
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
 $mountDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "mount"
 $bootMediaDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "BootMedia"
@@ -528,23 +528,93 @@ function Add-DebloatTools {
         $updatedTools = @()
 
         foreach ($tool in $debloatTools) {
+            # Skip tools where "Enabled" is false
+            if ($tool.Enabled -ne $true) {
+                Write-Host "`nSkipping tool: $($tool.Name) as it is not enabled" -ForegroundColor Yellow
+                continue
+            }
             $toolName = $tool.Name
-            $toolUrl = $tool.Url
-            $toolFilename = $tool.Filename
-            $toolScriptPath = Join-Path $setupDir "$toolFilename"
+            $toolUrl = $tool.DownloadUrl
+            $toolFilename = $tool.DownloadFilename
+            $toolExecutable = $tool.Executeable
+            $toolFolder = $tool.FolderName
+            # Validate that all required fields are not null or blank
+            if ([string]::IsNullOrWhiteSpace($toolName) -or 
+                [string]::IsNullOrWhiteSpace($toolUrl) -or 
+                [string]::IsNullOrWhiteSpace($toolFilename) -or 
+                [string]::IsNullOrWhiteSpace($toolExecutable) -or 
+                [string]::IsNullOrWhiteSpace($toolFolder)) {
+                Log-Warning "Tool ($toolName) is not valid and has been skipped. Missing required fields for tool."
+                continue
+            }
+            $toolFolderPath = Join-Path $setupDir "$toolFolder"
+            $toolScriptPath = Join-Path $setupDir "$toolFolder\$toolExecutable"
 
             Write-Host "`nFetching script for tool: $toolName`nFrom: $toolUrl"
-
+            # Download the script or tool from the download URL
             try {
+                # Make folder for the tool
+                New-Item -ItemType Directory -Path $toolFolderPath -Force -Verbose:$verbose | Out-Null
                 # Download the script
-                Invoke-RestMethod -Uri $toolUrl -OutFile $toolScriptPath
+                $destinationPath = Join-Path $toolFolderPath "$toolFilename"
+                $attempts = 0
+                $maxAttempts = 3
+                $success = $false
 
+                while ($attempts -lt $maxAttempts -and -not $success) {
+                    try {
+                        $webClient = New-Object System.Net.WebClient
+                        $webClient.DownloadFile($toolUrl, $destinationPath)
+                        Write-Host "Downloaded $toolFilename to $destinationPath"
+                        $success = $true
+                    } catch {
+                        $attempts++
+                        if ($attempts -lt $maxAttempts) {
+                            Write-Host "Attempt $attempts failed. Retrying in 3 seconds..."
+                            Start-Sleep -Seconds 3
+                        } else {
+                            Log-Warning "Failed to download $toolFilename from $toolUrl after $maxAttempts attempts."
+                            Write-Host "Marking $toolName as unavailable for offline use."
+                            $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
+                        }
+                    } finally {
+                        if ($webClient) { $webClient.Dispose() }
+                    }
+                }
+                if (-not $success) {
+                    continue
+                }
+                # If the downloaded file is a .zip, extract its contents
+                if ($toolFilename -like "*.zip") {
+                    Write-Host "Extracting $toolFilename to $toolFolderPath ..."
+                    try {
+                        Expand-Archive -Path $destinationPath -DestinationPath $toolFolderPath -Force
+                        Write-Host "Extracted $toolFilename successfully."
+                        # Optionally, remove the zip file after extraction
+                        Remove-Item $destinationPath -Force -Verbose:$verbose
+                    } catch {
+                        Log-Warning "Failed to extract $toolFilename`nTool will not be available offline: $_"
+                        continue
+                    }
+                }
                 # Validate the script
-                if ((Get-Content -Path $toolScriptPath -TotalCount 20 | ForEach-Object { $_.Trim() }) -match '^<#|^\s*function|^\s*\[CmdletBinding\(\)?\]') {
-                    Write-Host "Successfully downloaded and validated script for $toolName"
+                $fileExtension = [System.IO.Path]::GetExtension($toolScriptPath).ToLower()
+                if ($fileExtension -eq ".ps1") {
+                    if ((Get-Content -Path $toolScriptPath -TotalCount 20 -ErrorAction SilentlyContinue | ForEach-Object { $_.Trim() }) -match '^<#|^\s*function|^\s*\[CmdletBinding\(\)?\]') {
+                        Write-Host "Successfully downloaded and validated script for $toolName" -ForegroundColor Green
+                        $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $true -Force
+                    } else {
+                        Log-Warning "Downloaded script for $toolName is not a valid PowerShell script"
+                        $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
+                        if (Test-Path $toolScriptPath) {
+                            Remove-Item $toolScriptPath -Force -Verbose:$verbose
+                        }
+                    }
+                } elseif ($fileExtension -in ".exe", ".cmd", ".bat") {
+                    Write-Host "Executable file detected for $toolName. Marking as available offline." -ForegroundColor Green
                     $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $true -Force
                 } else {
-                    Write-Warning "Downloaded script for $toolName is not a valid PowerShell script"
+                    Log-Warning "Downloaded file for $toolName is not a supported type"
                     $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
                     if (Test-Path $toolScriptPath) {
                         Remove-Item $toolScriptPath -Force -Verbose:$verbose
@@ -552,8 +622,8 @@ function Add-DebloatTools {
                 }
             } catch {
                 Log-Warning "Failed to download or validate script for $toolName`: $_"
-                if (Test-Path $toolScriptPath) {
-                    Remove-Item $toolScriptPath -Force -Verbose:$verbose
+                if (Test-Path $toolFolderPath) {
+                    Remove-Item $toolFolderPath -Recurse -Force -Verbose:$verbose
                 }
                 $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
             }
@@ -656,7 +726,7 @@ try {
     Write-Host "`nNote: If Rufus prompts with Windows User Experience (eg. Remove Requirements, Disable Bitlocker, etc.)`nPlease uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools.`nMurrpTools will already include those features built-in." -ForegroundColor Yellow
     Write-Host $border -ForegroundColor Cyan
     Write-Host ""
-    Pause
+    Script-Exit $true
 }
 catch {
     Log-Error "Build failed. Cleaning up..."

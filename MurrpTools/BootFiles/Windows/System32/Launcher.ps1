@@ -1,3 +1,60 @@
+# Position Window code
+$host.UI.RawUI.WindowTitle = "MurrpTools Launcher"
+
+# Load the required assembly for screen dimensions
+Add-Type -AssemblyName System.Windows.Forms
+
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
+
+public class WinAPI {
+    [DllImport("user32.dll")]
+    public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+    
+    [DllImport("user32.dll")]
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+    
+    [DllImport("user32.dll")]
+    public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+    
+    [DllImport("user32.dll")]
+    public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+}
+"@
+
+# Get screen width and height dynamically
+$screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
+$screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
+
+# Define window size
+$windowWidth = 500
+$windowHeight = 370
+
+# Calculate bottom-right position
+$x = $screenWidth - $windowWidth - 40  # Near Right edge
+$y = $screenHeight - $windowHeight  # Bottom edge
+
+# Get all processes with main window handles
+$windows = @(Get-Process | Where-Object { $_.MainWindowHandle -ne 0 })
+
+foreach ($proc in $windows) {
+    $hWnd = $proc.MainWindowHandle
+    $procID = 0
+    [WinAPI]::GetWindowThreadProcessId($hWnd, [ref]$procID)
+
+    # Get the actual window title
+    $title = New-Object System.Text.StringBuilder 256
+    [WinAPI]::GetWindowText($hWnd, $title, $title.Capacity)
+
+    if ($title.ToString() -match "MurrpTools Launcher") {
+        [WinAPI]::SetWindowPos($hWnd, [IntPtr]::Zero, $x, $y, $windowWidth, $windowHeight, 0x0040)
+        break
+    }
+}
+# End Position Window code
+
 function Maximize-Window {
     Add-Type @"
     using System;

@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.9-Alpha"
+$MurrpToolsVersion = "v0.1.10-Alpha"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
@@ -469,7 +469,8 @@ Write-Host "`nCopy operations completed. Review any warnings above if any.`n" -F
 Write-Host $border -ForegroundColor Cyan
 Write-Host "`nPlease now navigate to $(Get-NormalizedPath $BuildLocation.ProviderPath)"
 Write-Host "`nAdd any desired Windows PE Drivers to the WinPE_Drivers folder.`nIf you need help finding drivers, check the ReadMe file in that folder."
-Write-Host "Once you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
+Write-Host "`nYou can also enable or disable any desired Debloat Tools by editing the DebloatTools.json file in the MurrpTools folder."
+Write-Host "`n`nOnce you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
 if (!($BuildPath)) {
     if ($BuildLocation.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
         Write-Host "`nPress any key to open the MurrpTools Build folder..."

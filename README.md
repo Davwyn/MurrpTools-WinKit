@@ -112,7 +112,16 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    
    Download either ([Official](https://www.microsoft.com/en-us/software-download/windows11) Windows Install Media (Easy) or create a [UUP dump](https://uupdump.net) ISO file (Advanced) and keep it in a easy to find location like your Downloads folder.
 
-5. **--Build MurrpTools Media--**
+5. **--Select Desired Debloat Tools (Optional)--**
+   Inside of the MurrpTools folder is a file called DebloatTools.json which contains a list of available debloat tools you can build into MurrpTools.
+   To make changes on desired debloat tools:
+   1. Open the DebloatTools.json file in Notepad or some other basic text editor of your choice.
+   2. After the name of each tool there is an "Enabled" line that reads 'true' or 'false'. Set to true if you want to enable the tool, or false if you want to disable it.
+
+   ⚠ Note: Do not edit the other values of the JSON files unless you are a developer testing adding new tools. Editing the other values in the JSON file can cause the debloat tools features to break, or MurrpTools fail to build.
+
+
+6. **--Build MurrpTools Media--**
     
    **Choose your method:**
 
@@ -131,7 +140,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    .\MurrpTools\2_Build_MurrpTools_Image.ps1 -IsoPath "C:\path\to\windows.iso"
    ```
 
-6. **--Image MurrpTools to Flash Drive--**
+7. **--Image MurrpTools to Flash Drive--**
 
       You can use any ISO to Flash Drive imaging tool you prefer, but here are instructions using Rufus below:
    
@@ -154,7 +163,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
         
         ![image](https://github.com/user-attachments/assets/62a82f41-fb74-4ce6-b1f2-ee64dd66b34b)
 
-7. **--MurrpTools is ready to be used--**
+8. **--MurrpTools is ready to be used--**
    
       Once your flash drive is imaged using Rufus or your preferred tool, you can now boot off of the flash drive the same way you would a standard Windows Installation media flash drive.
 

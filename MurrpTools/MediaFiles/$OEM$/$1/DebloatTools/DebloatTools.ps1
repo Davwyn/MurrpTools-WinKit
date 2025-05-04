@@ -26,8 +26,13 @@ $Tools = Get-Content -Path $JsonFilePath | ConvertFrom-Json
 
 # Validate files and update AvailableOffline property
 foreach ($Tool in $Tools) {
-    $FilePath = Join-Path -Path $PSScriptRoot -ChildPath $Tool.Filename
-    $Tool.AvailableOffline = Test-Path $FilePath
+    if ($Tool.AvailableOffline) {
+        $ToolFolderPath = Join-Path -Path $PSScriptRoot -ChildPath $Tool.FolderName
+        $ToolScriptPath = Join-Path -Path $ToolFolderPath -ChildPath $Tool.Executable
+        if (-Not (Test-Path $ToolScriptPath)) {
+            $Tool.AvailableOffline = $false
+        }
+    }
 }
 
 if ($OOBE) {
@@ -146,29 +151,111 @@ do {
             switch ($ToolOption) {
                 1 {
                     if ($InternetAccess) {
-                        # Save the command from the URL to a temporary file
-                        $TempScriptPath = [System.IO.Path]::GetTempFileName() + ".ps1"
-                        Write-Host "Downloading $($SelectedTool.Name) from the internet..." -ForegroundColor Yellow
-                        Invoke-RestMethod -Uri $SelectedTool.URL | Set-Content -Path $TempScriptPath
+                        $toolName = $SelectedTool.Name
+                        $toolUrl = $SelectedTool.DownloadUrl
+                        $toolFilename = $SelectedTool.DownloadFilename
+                        $toolExecutable = $SelectedTool.Executeable
+                        $tempFolder = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), [System.IO.Path]::GetRandomFileName())
+                        New-Item -ItemType Directory -Path $tempFolder | Out-Null
+                        Write-Host "Downloading $toolName from the internet..." -ForegroundColor Yellow
+                        Start-Sleep -Seconds 1
+                        # Download the script
+                        $destinationPath = Join-Path $tempFolder "$toolFilename"
+                        $attempts = 0
+                        $maxAttempts = 3
+                        $success = $false
 
+                        while ($attempts -lt $maxAttempts -and -not $success) {
+                            try {
+                                $webClient = New-Object System.Net.WebClient
+                                $webClient.DownloadFile($toolUrl, $destinationPath)
+                                Write-Host "Downloaded $toolFilename to $destinationPath"
+                                $success = $true
+                            } catch {
+                                $attempts++
+                                if ($attempts -lt $maxAttempts) {
+                                    Write-Host "Attempt $attempts failed. Retrying in 3 seconds..."
+                                    Start-Sleep -Seconds 3
+                                } else {
+                                    Write-Host "Failed to download $toolFilename from $toolUrl after $maxAttempts attempts." -ForegroundColor Red
+                                    Start-Sleep -Seconds 2
+                                    return # Go back to the previous menu
+                                }
+                            } finally {
+                                if ($webClient) { $webClient.Dispose() }
+                            }
+                        }
+
+                        # If the downloaded file is a .zip, extract its contents
+                        if ($toolFilename -like "*.zip") {
+                            Write-Host "Extracting $toolFilename to $tempFolder ..."
+                            try {
+                                Expand-Archive -Path $destinationPath -DestinationPath $tempFolder -Force
+                                Write-Host "Extracted $toolFilename successfully."
+                                # Optionally, remove the zip file after extraction
+                                Remove-Item $destinationPath -Force
+                            } catch {
+                                Write-Host "Failed to extract $toolFilename`: $_" -ForegroundColor Red
+                                Start-Sleep -Seconds 2
+                                return # Go back to the previous menu
+                            }
+                        }
                         # Execute the temporary script
-                        Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$TempScriptPath`"" -Wait
+                        $fileExtension = [System.IO.Path]::GetExtension($toolExecutable).ToLower()
+                        switch ($fileExtension) {
+                            ".ps1" {
+                                Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$tempFolder\$toolExecutable`"" -Wait
+                            }
+                            ".exe" {
+                                Start-Process -FilePath "$tempFolder\$toolExecutable" -Wait
+                            }
+                            { $_ -eq ".cmd" -or $_ -eq ".bat" } {
+                                Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$tempFolder\$toolExecutable`"" -Wait
+                            }
+                            default {
+                                Write-Host "Unsupported file type: $fileExtension" -ForegroundColor Red
+                                Pause
+                            }
+                        }
 
                         # Clean up the temporary file
-                        Remove-Item -Path $TempScriptPath -Force
+                        Remove-Item -Path $tempFolder -Recurse -Force
                         $ExitToolMenu = $true # Set flag to exit ToolOption menu
-                        break
                     } else {
                         Write-Host "Internet access is not available." -ForegroundColor Red
+                        Start-Sleep -Seconds 2
                     }
                 }
                 2 {
                     if ($SelectedTool.AvailableOffline) {
-                        Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$($SelectedTool.Filename)`"" -Wait
+                        $toolName = $SelectedTool.Name
+                        $toolExecutable = $SelectedTool.Executeable
+                        $toolFolderPath = Join-Path -Path $PSScriptRoot -ChildPath $SelectedTool.FolderName
+                        $toolScriptPath = Join-Path -Path $toolFolderPath -ChildPath $toolExecutable
+                        
+                        Write-Host "Starting $toolName from Offline storage..." -ForegroundColor Yellow
+                        Start-Sleep -Seconds 1
+                        $fileExtension = [System.IO.Path]::GetExtension($toolExecutable).ToLower()
+                        switch ($fileExtension) {
+                            ".ps1" {
+                                Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$($toolScriptPath)`"" -Wait
+                            }
+                            ".exe" {
+                                Start-Process -FilePath "$($toolScriptPath)" -Wait
+                            }
+                            { $_ -eq ".cmd" -or $_ -eq ".bat" } {
+                                Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$($toolScriptPath)`"" -Wait
+                            }
+                            default {
+                                Write-Host "Unsupported file type: $fileExtension" -ForegroundColor Red
+                                Pause
+                            }
+                        }
                         $ExitToolMenu = $true # Set flag to exit ToolOption menu
                         break
                     } else {
                         Write-Host "Offline file not available." -ForegroundColor Red
+                        Start-Sleep -Seconds 2
                     }
                 }
                 0 {

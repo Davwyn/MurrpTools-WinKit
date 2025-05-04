@@ -88,7 +88,11 @@ function Get-WindowsImages {
     return $TargetImage
 }
 
-Write-Host "-----------`nDriver Harvester`n-----------"
+$border = "-" * 20
+Write-Host $border -ForegroundColor Cyan
+Write-Host "Driver Harvester" -ForegroundColor Green
+Write-Host $border -ForegroundColor Cyan
+Write-Host ""
 $HarvesterPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $model = $(get-wmiobject Win32_ComputerSystem).Model
 $DriverExportPath = $HarvesterPath + "Drivers\" + $model
