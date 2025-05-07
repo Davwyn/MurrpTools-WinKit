@@ -33,8 +33,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 ## Technical Requirements
 - **OS**: Windows 10/11 (64-bit) build environment
 - **Tools**:
-  - DISM [(Windows ADK recommended)](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install)
-  - PowerShell 5.1+
+  - DISM *Built into Windows
+  - Windows PowerShell 5.1+
 - **Storage**: 15GB free space minimum
 - **Windows Install Media**: Windows 10 22H2/11 ISO ([Official](https://www.microsoft.com/en-us/software-download/windows11) or [UUP dump](https://uupdump.net))
 
