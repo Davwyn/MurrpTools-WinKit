@@ -22,17 +22,5 @@
     "DownloadFilename": "ChrisTitusTech.ps1",
     "Executeable": "ChrisTitusTech.ps1",
     "OOBESupported": false
-  },
-  {
-    "Name": "Memory's Winhance Windows Enhancement Utility",
-    "Enabled": false,
-    "Description": "A Windows Debloat utility by Youtuber Memory designed to clean bloat out of Windows and attempt to keep it out.",
-    "Author": "Memory",
-    "Website": "https://github.com/memstechtips/Winhance",
-    "FolderName": "Winhance",
-    "DownloadURL": "https://github.com/memstechtips/Winhance/raw/main/Winhance.ps1",
-    "DownloadFilename": "Winhance.ps1",
-    "Executeable": "Winhance.ps1",
-    "OOBESupported": false
   }
 ]
