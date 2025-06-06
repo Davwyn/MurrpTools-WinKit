@@ -14,7 +14,7 @@
   {
     "Name": "O&O ShutUp10++",
     "Enabled": true,
-    "Description": "Free antispy tool for Windows 10 and 11 that allows you to control the data that is sent to Microsoft and other companies.",
+    "Description": "Free antispy tool for Windows 10 and 11 that allows you to control the data that is sent to Microsoft and other companies.`n`nNote: If used during Windows Setup, only Local Machine settings will be applied. Current User settings will do nothing. Run again after setup to do Current User settings.",
     "Author": "O&O Software GmbH",
     "Website": "https://www.oosoftware.com/en/shutup10",
     "FolderName": "OandOShutUp10",

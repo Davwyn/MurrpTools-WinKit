@@ -601,7 +601,7 @@ function Add-DebloatTools {
                 $fileExtension = [System.IO.Path]::GetExtension($toolScriptPath).ToLower()
                 if ($fileExtension -eq ".ps1") {
                     if ((Get-Content -Path $toolScriptPath -TotalCount 20 -ErrorAction SilentlyContinue | ForEach-Object { $_.Trim() }) -match '^<#|^\s*function|^\s*\[CmdletBinding\(\)?\]') {
-                        Write-Host "Successfully downloaded and validated script for $toolName" -ForegroundColor Green
+                        Write-Host "Successfully downloaded and validated script for $toolName. Marking as available offline." -ForegroundColor Green
                         $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $true -Force
                     } else {
                         Log-Warning "Downloaded script for $toolName is not a valid PowerShell script"
@@ -611,7 +611,7 @@ function Add-DebloatTools {
                         }
                     }
                 } elseif ($fileExtension -in ".exe", ".cmd", ".bat") {
-                    Write-Host "Executable file detected for $toolName. Marking as available offline." -ForegroundColor Green
+                    Write-Host "Executable file downloaded for $toolName. Marking as available offline." -ForegroundColor Green
                     $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $true -Force
                 } else {
                     Log-Warning "Downloaded file for $toolName is not a supported type"
