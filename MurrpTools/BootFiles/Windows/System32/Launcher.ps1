@@ -27,8 +27,8 @@ $screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
 $screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
 
 # Define window size
-$windowWidth = 500
-$windowHeight = 370
+$windowWidth = 520
+$windowHeight = 400
 
 # Calculate bottom-right position
 $x = $screenWidth - $windowWidth - 40  # Near Right edge

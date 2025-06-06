@@ -34,7 +34,7 @@ param (
 )
 
 # Script-level variables
-$MurrpToolsVersion = "v0.1.10-Alpha"
+$MurrpToolsVersion = "v0.1.11-Alpha"
 $MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
 $mountDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "mount"
 $bootMediaDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "BootMedia"

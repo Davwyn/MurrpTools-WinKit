@@ -65,7 +65,11 @@ function Show-Menu {
     }
 
     # Add exit option
-    Write-Host "0. Continue Windows Setup"
+    if ($OOBE) {
+        Write-Host "0. Continue Windows Setup"
+    } else {
+        Write-Host "0. Exit"
+    }
 }
 
 # Function to display tool details and options
@@ -275,4 +279,4 @@ do {
 
 } while ($Selection -ne 0)
 
-Write-Host "Exiting script. Continuing Windows setup..." -ForegroundColor Green
+Write-Host "Exiting script..." -ForegroundColor Green
