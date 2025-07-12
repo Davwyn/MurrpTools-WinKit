@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v0.1.11-Alpha"
+$MurrpToolsVersion = "v0.1.12-Alpha"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
@@ -76,10 +76,14 @@ function Join-UNCPath {
 function Get-NormalizedPath {
     param ([string]$Path)
     if ($Path -like "\\?\*") {
-        $NewPath = $Path.Substring(4) # Remove \\?\ prefix
-        return [System.IO.Path]::GetFullPath($NewPath.TrimEnd('\'))  # Remove trailing backslashes
+        $NewPath = $Path.Substring(4)
+        return [System.IO.Path]::GetFullPath($NewPath.TrimEnd('\'))
     }
-    return [System.IO.Path]::GetFullPath($Path.TrimEnd('\'))  # Remove trailing backslashes
+    # Check if it's a root path like "C:\"
+    if ($Path -match '^[a-zA-Z]:\\$') {
+        return [System.IO.Path]::GetFullPath($Path)
+    }
+    return [System.IO.Path]::GetFullPath($Path.TrimEnd('\'))
 }
 
 # Initialize script file path
