@@ -1,6 +1,6 @@
 [AutoRun.Amd64]
 open=setup.exe
-icon=Derg.ico
+icon=MurrpTools.ico
 
 [AutoRun]
 open=sources\SetupError.exe x64

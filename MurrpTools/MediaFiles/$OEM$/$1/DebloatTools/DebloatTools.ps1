@@ -58,7 +58,8 @@ function Show-Menu {
     } else {
         Write-Host "1. -Wifi Connection Menu Not Available-" -ForegroundColor DarkGray
     }
-    $Index = 2
+    Write-Host "2. Open PowerShell"
+    $Index = 3
     foreach ($Tool in $SortedTools) {
         Write-Host "$Index. $($Tool.Name)"
         $Index++
@@ -130,11 +131,22 @@ do {
         Show-NetworkManager # Open PE Network Manager
         continue
     }
+    
+    # PowerShell
+    if ($Selection -eq 2) {
+        Clear-Host
+        Write-Host "###### Warning Do NOT Close this PowerShell Window ######" -ForegroundColor Red
+        Write-Host "###### Closing this window will result in Windows setup resuming ######" -ForegroundColor Red
+        Write-Host "Opening PowerShell Window..."
+        Start-Sleep 5
+        Start-Process powershell.exe -Wait
+        continue
+    }
 
     # Ensure selection matches the sorted list
     $SortedTools = $Tools | Sort-Object { if ($_.Name -eq "Davwyn's Debloater") { 0 } else { 1 } }
-    if ($Selection -gt 1 -and $Selection -le ($SortedTools.Count + 1)) {
-        $SelectedTool = $SortedTools[$Selection - 2] # Adjust for zero-based indexing
+    if ($Selection -gt 1 -and $Selection -le ($SortedTools.Count + 2)) { # Count is 2 for the two hard-coded tools
+        $SelectedTool = $SortedTools[$Selection - 3] # Adjust for zero-based indexing and 2 hard-coded tools
     } else {
         Write-Host "Invalid selection. Please try again." -ForegroundColor Red
         Start-Sleep -Seconds 2

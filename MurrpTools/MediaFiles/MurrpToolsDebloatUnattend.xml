@@ -380,8 +380,8 @@ $scripts = @(
 	{
 		# Add MurrpTools Desktop Shortcut
 		$cmdPath = "C:\DebloatTools\DebloatTools.cmd"
-		$shortcutPath = "C:\Users\Public\Desktop\Debloat Tools.lnk"
-		$iconPath = "C:\DebloatTools\derg.ico"
+		$shortcutPath = "C:\Users\Public\Desktop\MurrpTools Debloat.lnk"
+		$iconPath = "C:\DebloatTools\MurrpTools.ico"
 		
 		$WshShell = New-Object -ComObject WScript.Shell
 		$shortcut = $WshShell.CreateShortcut($shortcutPath)

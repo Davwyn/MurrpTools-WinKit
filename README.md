@@ -2,6 +2,8 @@
 
 ![MurrpTools_Display](https://github.com/user-attachments/assets/967c5d42-681c-47a1-8290-c8942cfef249)
 
+![MurrpTools latest version](https://img.shields.io/badge/dynamic/json.svg?label=Latest%20version:&url=https://api.github.com/repos/Davwyn/MurrpTools-WinKit/releases/latest&query=$.name&style=for-the-badge)
+
 ## About MurrpTools
 MurrpTools is an all-in-one Windows toolkit that helps both computer technicians and everyday users:
 - Create customized Windows installation/recovery media
@@ -188,3 +190,20 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 If you are interested in adding your Debloat Tool to MurrpTools, please read the "Developers of Debloat Tools ReadMe.md" file in this repo.
 
 You can either send a Pull Request to edit DebloatTools.json, or open an Issue supplying all of the details of your debloat tool to be included.
+
+## Help This Project
+The base MurrpTools project has been developed souly by myself, Davwyn.
+
+I would greatly appreciate help from other developers in the following categories:
+
+- Bug hunting/fixing: If you can find something wrong, please share or make a pull request
+
+- Code improvements: If you can offer code improvements please create an Issue or Pull Request and I'll review it when I can
+
+- Davwyn's Debloat Improvements: [Davwyn's Debloat Script](https://github.com/Davwyn/DavwynsDebloater) is very rough around the edges. If developers are willing to lend a hand, I would love it if we can colaborate to make a simple UI for the tool so users can easily make their debloat selections and refactor the code entirely.
+
+- Tutorials: Do you make slick tutorials? Please let me know if you post a tutorial for MurrpTools and I'll add your tutorial to a Tutorials page!
+
+- Spread the Word: I made this tool entirely for friends that need to use Windows. Word of mouth is powerful. If you like MurrpTools, tell your friends!
+
+- Want to donate? I would always appreciate even a [small tip via Stream Elements](https://streamelements.com/davwyn/tip).

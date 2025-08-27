@@ -26,13 +26,41 @@ public class WinAPI {
 $screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
 $screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
 
-# Define window size
-$windowWidth = 520
-$windowHeight = 400
+# Base‐resolution values for Launcher position
+$baseWidth      = 1024
+$baseHeight     = 768
+$baseLauncherWindowWidth  = 520 # base window width
+$baseLauncherWindowHeight = 400 # base window height
+$baseRightOffset  = 50    # px from right at 1024×768
+$baseBottomOffset = 80   # px from bottom at 1024×768
 
-# Calculate bottom-right position
-$x = $screenWidth - $windowWidth - 40  # Near Right edge
-$y = $screenHeight - $windowHeight  # Bottom edge
+# Compute fractions to adjust for higher screen resolutions
+$fractionRight  = $baseRightOffset  / $baseWidth
+$fractionBottom = $baseBottomOffset / $baseHeight
+$fractionWidth = $baseLauncherWindowWidth / $baseWidth
+$fractionHeight = $baseLauncherWindowHeight / $baseHeight
+
+# Decide positioning based on size
+if ($screenWidth -lt $baseWidth -or $screenHeight -lt $baseHeight) {
+    # Low‐res: bottom‐left
+    $launcherXPos = 10
+    $launcherYPos = $screenHeight - $windowHeight - 10
+    $launcherWindowWidth = $baseLauncherWindowWidth
+    $launcherWindowHeight = $baseLauncherWindowHeight
+}
+else {
+    # New Width,Height
+    $launcherWindowWidth = [math]::Round($screenWidth  * $fractionWidth)
+    $launcherWindowHeight = [math]::Round($screenHeight * $fractionHeight)
+    
+    # High‐res: scale offsets
+    $scaledRight  = [math]::Round($screenWidth  * $fractionRight)
+    $scaledBottom = [math]::Round($screenHeight * $fractionBottom)
+
+    # New X,Y
+    $launcherXPos = $screenWidth  - $launcherWindowWidth  - $scaledRight
+    $launcherYPos = $screenHeight - $launcherWindowHeight - $scaledBottom
+}
 
 # Get all processes with main window handles
 $windows = @(Get-Process | Where-Object { $_.MainWindowHandle -ne 0 })
@@ -47,7 +75,7 @@ foreach ($proc in $windows) {
     [WinAPI]::GetWindowText($hWnd, $title, $title.Capacity)
 
     if ($title.ToString() -match "MurrpTools Launcher") {
-        [WinAPI]::SetWindowPos($hWnd, [IntPtr]::Zero, $x, $y, $windowWidth, $windowHeight, 0x0040)
+        [WinAPI]::SetWindowPos($hWnd, [IntPtr]::Zero, $launcherXPos, $launcherYPos, $launcherWindowWidth, $launcherWindowHeight, 0x0040)
         break
     }
 }
