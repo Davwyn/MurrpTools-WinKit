@@ -8,6 +8,8 @@
 
 
 ## License
+<a href="https://github.com/Davwyn/MurrpTools-WinKit/blob/main/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/Davwyn/MurrpTools-WinKit?style=for-the-badge"></a>
+
 MurrpTools is licensed under ![GNU GPL v3 License](https://github.com/Davwyn/MurrpTools-WinKit/blob/main/LICENSE) excluding the Dependencies directory whose licenses are each to their own. See ![Dependencies README](https://github.com/Davwyn/MurrpTools-WinKit/blob/main/Dependencies/README.md) for more details.
 
 ## About MurrpTools
