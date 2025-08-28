@@ -156,11 +156,15 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 
 7. **--Image MurrpTools to Flash Drive--**
 
-      You can use any ISO to Flash Drive imaging tool you prefer, but here are instructions using Rufus below:
+   You will need an ISO to Flash Drive imaging tool to 'flash' the MurrpTools software to a flash drive and make it bootable.
+
+   You can use any ISO to Flash Drive imaging tool you prefer, but here are instructions using Rufus below:
    
    **-Using Rufus-**
    
    Rufus Tool is available at: https://rufus.ie
+
+   Download either the full or portable version of Rufus and open it and select the below settings
    
    **Reccomended setings for Rufus:**
       - Partition scheme: GPT
@@ -177,7 +181,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
         
         ![image](https://github.com/user-attachments/assets/62a82f41-fb74-4ce6-b1f2-ee64dd66b34b)
 
-8. **--MurrpTools is ready to be used--**
+9. **--MurrpTools is ready to be used--**
    
       Once your flash drive is imaged using Rufus or your preferred tool, you can now boot off of the flash drive the same way you would a standard Windows Installation media flash drive.
 
