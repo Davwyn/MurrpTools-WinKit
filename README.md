@@ -4,15 +4,17 @@
 <img width="1024" height="768" alt="MurrpTools Screen" src="https://github.com/user-attachments/assets/21b3079c-346d-4985-9c5d-768ee67b9fd2" />
 
 <br></br>
-![MurrpTools latest version](https://img.shields.io/github/v/release/Davwyn/MurrpTools-WinKit?display_name=release&style=for-the-badge)
+<a href="https://github.com/Davwyn/MurrpTools-WinKit/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/Davwyn/MurrpTools-WinKit?display_name=release&style=for-the-badge"></a>
+
 
 ## License
 MurrpTools is licensed under ![GNU GPL v3 License](https://github.com/Davwyn/MurrpTools-WinKit/blob/main/LICENSE) excluding the Dependencies directory whose licenses are each to their own. See ![Dependencies README](https://github.com/Davwyn/MurrpTools-WinKit/blob/main/Dependencies/README.md) for more details.
 
 ## About MurrpTools
 MurrpTools is an all-in-one Windows toolkit that helps both computer technicians and everyday users:
+- Install Windows without the bloat and have full control of your Windows experience
 - Create customized Windows installation/recovery media
-- Improve computer performance through smart reinstallation with debloating
+- Improve computer performance
 - Simplify system repairs and recovery for Windows computers
 
 **Key Features:**
@@ -59,9 +61,10 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 1. **--Download the Software--**
    
    **-Option 1 - Simple ZIP Download-**
-   1. Click the green "Code" button at the top of this page
-   2. Select "Download ZIP"
-   3. Extract the ZIP file to your preferred location (e.g. Desktop)
+   1. Download the latest release zip:
+      
+      <a href="https://github.com/Davwyn/MurrpTools-WinKit/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/Davwyn/MurrpTools-WinKit?display_name=release&style=for-the-badge"></a>
+   2. Extract the ZIP file to your preferred location (e.g. Desktop)
 
    **-Option 2 - Git Clone (For advanced Users)-**
    ```powershell
