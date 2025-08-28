@@ -115,11 +115,6 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
       ```
       MurrpTools/WinPE_Drivers/
       ```
-   ```mermaid
-   flowchart LR
-       A[Download OEM Drivers] --> B[Extract CAB files]
-       B --> C[Place in WinPE_Drivers]
-   ```
 
 4. **--Download Windows Install Media--**
    
@@ -177,7 +172,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
   
         After you click 'Start' Rufus may prompt with 'Windows User Experience' (eg. Remove Requirements, Disable Bitlocker, etc.)
 
-        Please uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools.`nMurrpTools will already include those features built-in.
+        Please uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools. MurrpTools will already include those features built-in.
         
         ![image](https://github.com/user-attachments/assets/62a82f41-fb74-4ce6-b1f2-ee64dd66b34b)
 
