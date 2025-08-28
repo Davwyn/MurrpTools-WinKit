@@ -1,8 +1,12 @@
 # MurrpTools - Custom Windows Deployment Toolkit
 
-![MurrpTools_Display](https://github.com/user-attachments/assets/967c5d42-681c-47a1-8290-c8942cfef249)
+<div align="center"><img width="600" height="600" alt="MurrpTools Logo with text glow 600px" src="https://github.com/user-attachments/assets/c2fa8b6f-f019-4a92-91be-134dcb0dbf55" /></div>
+<img width="1024" height="768" alt="MurrpTools Screen" src="https://github.com/user-attachments/assets/21b3079c-346d-4985-9c5d-768ee67b9fd2" />
 
-![MurrpTools latest version](https://img.shields.io/badge/dynamic/json.svg?label=Latest%20version:&url=https://api.github.com/repos/Davwyn/MurrpTools-WinKit/releases/latest&query=$.name&style=for-the-badge)
+<br></br>
+![MurrpTools latest version](https://img.shields.io/github/v/release/Davwyn/MurrpTools-WinKit?display_name=release&style=for-the-badge)
+
+
 
 ## About MurrpTools
 MurrpTools is an all-in-one Windows toolkit that helps both computer technicians and everyday users:
@@ -31,6 +35,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    - Treesize Disk Usage Explorer
    - Explorer++ File Manager
    - Wipefile Secure File Eraser
+ 
+<img width="1024" height="384" alt="Side by side StartMenu" src="https://github.com/user-attachments/assets/3bcd2ce9-631b-46b6-8ea5-5992d3b28e46" />
 
 ## Technical Requirements
 - **OS**: Windows 10/11 (64-bit) build environment
@@ -39,6 +45,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
   - Windows PowerShell 5.1+
 - **Storage**: 15GB free space minimum
 - **Windows Install Media**: Windows 10 22H2/11 ISO ([Official](https://www.microsoft.com/en-us/software-download/windows11) or [UUP dump](https://uupdump.net))
+
 
 ## Getting Started Guide
 
@@ -172,7 +179,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 
       From there you can use MurrpTools as a toolkit for diagnostics, repair, and recovery, or you can click the "Install Windows with MurrpTools" button on the launcher to install Windows with MurrpTools handling various aspects of the setup including offering options to debloat Windows on it's first start up.
 
-   ![image](https://github.com/user-attachments/assets/b3c336a7-7574-48a3-b34f-27bff006d737)
+<img width="571" height="471" alt="Installing Windows Tip" src="https://github.com/user-attachments/assets/11068142-5750-41be-aded-1799abc13030" />
+
 
 
 ## Special Thanks
