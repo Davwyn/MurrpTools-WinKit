@@ -6,7 +6,8 @@
 <br></br>
 ![MurrpTools latest version](https://img.shields.io/github/v/release/Davwyn/MurrpTools-WinKit?display_name=release&style=for-the-badge)
 
-
+## License
+MurrpTools is licensed under ![GNU GPL v3 License](https://github.com/Davwyn/MurrpTools-WinKit/blob/main/LICENSE) excluding the Dependencies directory whose licenses are each to their own. See ![Dependencies README](https://github.com/Davwyn/MurrpTools-WinKit/blob/main/Dependencies/README.md) for more details.
 
 ## About MurrpTools
 MurrpTools is an all-in-one Windows toolkit that helps both computer technicians and everyday users:
