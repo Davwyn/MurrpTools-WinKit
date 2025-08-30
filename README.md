@@ -51,6 +51,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 - **Storage**: 15GB free space minimum
 - **Windows Install Media**: Windows 10 22H2/11 ISO ([Official](https://www.microsoft.com/en-us/software-download/windows11) or [UUP dump](https://uupdump.net))
 
+## Video Tutorial
+<a href="https://www.youtube.com/watch?v=LYYtJzbrzHE"><img width=50% height=auto alt="MurrpTools Video Screenshot" src="https://github.com/user-attachments/assets/b218f6ab-f6ef-4791-a40e-572af022839f" /><br /><b>Video Tutorial</b></a>
 
 ## Getting Started Guide
 
