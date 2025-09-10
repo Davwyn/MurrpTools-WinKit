@@ -46,6 +46,14 @@ $Script:ISOmountResult = $null
 $Script:ISOdriveLetter = $null
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
+# Check PowerShell version and refuse to run if not Windows PowerShell 5 due to compatibility issues with PowerShell 7
+if ($PSVersionTable.PSEdition -ne "Desktop" -or $PSVersionTable.PSVersion.Major -ne 5) {
+    Write-Host "This script can only run on Windows PowerShell 5." -ForegroundColor Yellow
+    Write-Host "Please use Windows PowerShell 5 and try again." -ForegroundColor Yellow
+    Read-Host -Prompt "Press enter to continue..."
+    exit 1
+}
+
 function Log-Error {
     param($message)
     $Script:errorLog += $message
@@ -75,11 +83,11 @@ function Script-Exit {
 
     if ($isSuccess) {
         Write-Host "`nScript completed successfully" -ForegroundColor Green
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         exit 0
     } else {
         Write-Host "`nScript failed" -ForegroundColor Red
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         exit 1
     }
 }
@@ -105,7 +113,7 @@ function Cleanup {
                 Write-Host "Cleaned up folder: $folder"
             } catch {
                 Log-Error "Failed to remove $folder - please delete manually"
-                Pause
+                Read-Host -Prompt "Press enter to continue..."
             }
         }
     }
@@ -679,7 +687,7 @@ if (!($ISOImage)) {
     Write-Host "`nThis script will build a custom MurrpTools 64bit Windows Installation and WinPE image.`n"
     Write-Host "You will need to supply MurrpTools Image builder either a 64bit Windows 10 22H2, or 64bit Windows 11 installation media ISO file or optionally one built using UUP Dump. It must be in ISO format.`n"
     Write-Host "`nPress enter and a selection window will open to select the ISO file."
-    Pause
+    Read-Host -Prompt "Press enter to continue..."
     Write-Host ""
 }
 

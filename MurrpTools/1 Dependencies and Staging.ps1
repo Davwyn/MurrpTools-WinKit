@@ -43,6 +43,14 @@ $MurrpToolsVersion = "v1.0.0"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
+# Check PowerShell version and refuse to run if not Windows PowerShell 5 due to compatibility issues with PowerShell 7
+if ($PSVersionTable.PSEdition -ne "Desktop" -or $PSVersionTable.PSVersion.Major -ne 5) {
+    Write-Host "This script can only run on Windows PowerShell 5." -ForegroundColor Yellow
+    Write-Host "Please use Windows PowerShell 5 and try again." -ForegroundColor Yellow
+    Read-Host -Prompt "Press enter to continue..."
+    exit 1
+}
+
 function Get-UNCPath {
     param (
         [string]$Path
@@ -121,11 +129,11 @@ function Script-Exit {
 
     if ($isSuccess) {
         Write-Host "`nScript completed successfully" -ForegroundColor Green
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         exit 0
     } else {
         Write-Host "`nScript failed" -ForegroundColor Red
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         exit 1
     }
 }
@@ -164,7 +172,7 @@ function Copy-MurrpTools {
     }
     catch {
         Log-Error "Failed to copy MurrpTools folder: $_"
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         Script-Exit $false
     }
 }
@@ -327,7 +335,7 @@ function Expand-Dependencies {
 
     if (Test-Path $ArchivePath) {
         Write-Host "`nThe dependencies have not yet been extracted. Press enter to extract them now." -ForegroundColor Yellow
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         
         Write-Host "`nFound dependencies archive: $ArchivePath. Extracting contents..." -ForegroundColor Yellow
         if (Test-Path $7ZipPath) {
@@ -478,7 +486,7 @@ Write-Host "`n`nOnce you are ready to build, run the '2 Build Windows Image.ps1'
 if (!($BuildPath)) {
     if ($BuildLocation.ProviderPath -ne $MurrpToolsScriptPath.ProviderPath) {
         Write-Host "`nPress any key to open the MurrpTools Build folder..."
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         Start-Process -FilePath "Explorer.exe" -ArgumentList $BuildLocation.ProviderPath
         Script-Exit $true
     } else {

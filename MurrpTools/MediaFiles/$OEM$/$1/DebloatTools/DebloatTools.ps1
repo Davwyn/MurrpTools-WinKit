@@ -11,7 +11,7 @@ function Test-Admin {
 # Script Start
 if (-not (Test-Admin)) {
     Write-Error "`nThis script must be run as administrator.`n"
-    Pause
+    Read-Host -Prompt "Press enter to continue..."
     Exit
 }
 # Load JSON file
@@ -19,7 +19,7 @@ Set-Location $PSScriptRoot
 $JsonFilePath = Join-Path -Path $PSScriptRoot -ChildPath "DebloatTools.json"
 if (-Not (Test-Path $JsonFilePath)) {
     Write-Error "DebloatTools.json not found in the script directory."
-    Pause
+    Read-Host -Prompt "Press enter to continue..."
     exit
 }
 $Tools = Get-Content -Path $JsonFilePath | ConvertFrom-Json
@@ -230,7 +230,7 @@ do {
                             }
                             default {
                                 Write-Host "Unsupported file type: $fileExtension" -ForegroundColor Red
-                                Pause
+                                Read-Host -Prompt "Press enter to continue..."
                             }
                         }
 
@@ -264,7 +264,7 @@ do {
                             }
                             default {
                                 Write-Host "Unsupported file type: $fileExtension" -ForegroundColor Red
-                                Pause
+                                Read-Host -Prompt "Press enter to continue..."
                             }
                         }
                         $ExitToolMenu = $true # Set flag to exit ToolOption menu

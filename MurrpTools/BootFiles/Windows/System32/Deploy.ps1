@@ -36,7 +36,7 @@ if ($MurrpToolsSource) {
         Write-Host "`nInstall completed successfully."
     } else {
         Write-Host "`nInstall process failed with exit code: $($InstallProcess.ExitCode) `nAborting any additional setup."
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         Return 1
     }
     Start-Sleep 2
@@ -57,20 +57,20 @@ if ($MurrpToolsSource) {
             Write-Host "`nInjecting drivers into your new Windows installation..."
             dism /add-driver /image:$WinInstallLocation /driver:"$MurrpToolsSource\Drivers\$model" /Recurse
             Write-Host "`n`nDriver injection should be complete.`nPress enter to restart or close the window to prevent restart.`n"
-            Pause
+            Read-Host -Prompt "Press enter to continue..."
             Write-Host "`nRestarting...`n"
             wpeutil reboot
         } else {
             Write-Warning "Unable to find your Windows installation. Unable to inject drivers into the installation for you."
-            Pause
+            Read-Host -Prompt "Press enter to continue..."
         }
     } else {
         Write-Host "`nNo available drivers detected for your system setup will continue with default Windows drivers.`nPress enter to restart or close the window to prevent restart.`n"
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         Write-Host "`nRestarting...`n"
         wpeutil reboot
     }
 } else {
 	"`nCould not find the MurrpToolsDebloatUnattend.xml unable to run the installer with debloat." | Write-Warning
-	Pause
+	Read-Host -Prompt "Press enter to continue..."
 }

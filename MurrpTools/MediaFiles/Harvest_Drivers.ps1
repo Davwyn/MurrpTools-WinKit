@@ -82,7 +82,7 @@ function Get-WindowsImages {
         }
     } else {
         Write-Host "`n-----------`nWARNING: No Windows installations found for harvesting drivers.`n-----------`nPossibly the drive was encrypted with Bitlocker.`nIf the drive was encrypted with Bitlocker try the command: manage-bde -unlock c: -recoverypassword`nFollowed by the recovery key, or harvest the drivers while Windows is running.`n"
-        Pause
+        Read-Host -Prompt "Press enter to continue..."
         $TargetImage = $null
     }
     return $TargetImage
