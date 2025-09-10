@@ -89,12 +89,12 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    3. Copy/paste this command:
    ```powershell
    Set-ExecutionPolicy Bypass -Scope Process
-   .\MurrpTools\1_Dependencies_and_Staging.ps1 -BuildSelf
+   & ".\MurrpTools\1 Dependencies and Staging.ps1" -BuildSelf
    ```
    or to build in a specific folder:
    ```powershell
    Set-ExecutionPolicy Bypass -Scope Process
-   .\MurrpTools\1_Dependencies_and_Staging.ps1 -BuildPath C:\Build
+   & ".\MurrpTools\1 Dependencies and Staging.ps1" -BuildPath C:\Build
    ```
    In which you replace C:\Build with the path you'd like to build the project.
 
@@ -135,18 +135,20 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    **Choose your method:**
 
    🖱️ **-Easy Method-**
+   Go to the folder you selected to unpack to back in step #2. If you choose to build at current location the script will be in the same folder.
    1. Find "2 Build MurrpTools Image.cmd" in the folder
    2. You might need to right-click on the file and go into 'Properties'. If there is an 'Unblock' button push it. Otherwise just click OK.
    3. Right-click the file and select "Run as Administrator"
    4. Follow the prompts, you will be asked for the Windows Install Media ISO file, using the file picker that opens select the ISO file you downloaded earlier.
 
    💻 **-PowerShell Method (For advanced users)-**
+   Go to the folder you selected to unpack to back in step #2. If you choose to build at current location the script will be in the same folder.
    1. Right-click the Start menu
    2. Select "Windows Terminal (Admin)"
    3. Copy/paste this command:
    ```powershell
    Set-ExecutionPolicy Bypass -Scope Process
-   .\MurrpTools\2_Build_MurrpTools_Image.ps1 -IsoPath "C:\path\to\windows.iso"
+   & ".\MurrpTools\2 Build MurrpTools Image.ps1" -IsoImage "C:\path\to\windows.iso"
    ```
 
 7. **--Image MurrpTools to Flash Drive--**
@@ -196,6 +198,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
   - Sky (Skybox Monster)
   - Lord Flame Stryke
   - Kehvarl
+  - Talonius
 
 ## Message to Debloat Tool Developers
 If you are interested in adding your Debloat Tool to MurrpTools, please read the "Developers of Debloat Tools ReadMe.md" file in this repo.
