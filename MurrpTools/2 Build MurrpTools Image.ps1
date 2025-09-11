@@ -46,27 +46,19 @@ $Script:ISOmountResult = $null
 $Script:ISOdriveLetter = $null
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
-# Check PowerShell version and refuse to run if not Windows PowerShell 5 due to compatibility issues with PowerShell 7
-if ($PSVersionTable.PSEdition -ne "Desktop" -or $PSVersionTable.PSVersion.Major -ne 5) {
-    Write-Host "This script can only run on Windows PowerShell 5." -ForegroundColor Yellow
-    Write-Host "Please use Windows PowerShell 5 and try again." -ForegroundColor Yellow
-    Read-Host -Prompt "Press enter to continue..."
-    exit 1
-}
-
-function Log-Error {
+function Write-ErrorLog {
     param($message)
     $Script:errorLog += $message
     Write-Host "[ERROR] $message" -ForegroundColor Red
 }
 
-function Log-Warning {
+function Write-WarningLog {
     param($message)
     $Script:warningLog += $message
     Write-Host "[WARNING] $message" -ForegroundColor Yellow
 }
 
-function Script-Exit {
+function Exit-Script {
     param(
         [bool]$isSuccess
     )
@@ -79,6 +71,10 @@ function Script-Exit {
     if ($Script:warningLog.Count -gt 0) {
         Write-Host "Warnings encountered:" -ForegroundColor Yellow
         $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
+    }
+    
+    if (Get-PSDrive -Name "BuildDrive" -ErrorAction SilentlyContinue) {
+        Remove-PSDrive -Name "BuildDrive" -Force -ErrorAction SilentlyContinue
     }
 
     if ($isSuccess) {
@@ -100,7 +96,7 @@ function Cleanup {
             Dismount-WindowsImage -Path $mountDir -Discard
             Write-Host "WIM unmounted and changes discarded"
         } catch {
-            Log-Error "Failed to unmount WIM: $_"
+            Write-ErrorLog "Failed to unmount WIM: $_"
         }
     }
 
@@ -112,7 +108,7 @@ function Cleanup {
                 Remove-Item $folder -Recurse -Force -Verbose:$verbose
                 Write-Host "Cleaned up folder: $folder"
             } catch {
-                Log-Error "Failed to remove $folder - please delete manually"
+                Write-ErrorLog "Failed to remove $folder - please delete manually"
                 Read-Host -Prompt "Press enter to continue..."
             }
         }
@@ -125,7 +121,7 @@ function Cleanup {
             $Script:ISOmountResult = $null
             Write-Host "Unmounted ISO image"
         } catch {
-            Log-Error "Failed to unmount ISO: $_"
+            Write-ErrorLog "Failed to unmount ISO: $_"
         }
     }
 }
@@ -142,9 +138,9 @@ function Initialize-Directories {
         Write-Host "Mount directory created successfully."
     }
     catch {
-        Log-Error "Failed to create mount directory: $_"
+        Write-ErrorLog "Failed to create mount directory: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -269,15 +265,15 @@ function Build-Image {
             $ISOImage = Resolve-Path $ISOImage
             Write-Host "ISO Image supplied as: $ISOImage"
         } catch {
-            Log-Error "Failed to resolve ISO path: $_"
+            Write-ErrorLog "Failed to resolve ISO path: $_"
             Cleanup
-            Script-Exit $false
+            Exit-Script $false
         }
         # Use provided ISO path
         if (-not (Test-Path $ISOImage)) {
-            Log-Error "Specified ISO file does not exist: $ISOImage"
+            Write-ErrorLog "Specified ISO file does not exist: $ISOImage"
             Cleanup
-            Script-Exit $false
+            Exit-Script $false
         }
         $isoFile = Get-Item $ISOImage
     }
@@ -294,9 +290,9 @@ function Build-Image {
             $isoFile = Get-Item $filePicker.FileName
         }
         else {
-            Log-Warning "Operation aborted by user."
+            Write-WarningLog "Operation aborted by user."
             Cleanup
-            Script-Exit $false
+            Exit-Script $false
         }
     }
 
@@ -317,9 +313,9 @@ function Build-Image {
         Write-Host "`nCopied ISO contents to BootMedia folder sucessfully."
     }
     catch {
-        Log-Error "Failed to process ISO file: $_"
+        Write-ErrorLog "Failed to process ISO file: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
     finally {
         if ($Script:ISOmountResult) {
@@ -341,9 +337,9 @@ function Mount-Wim {
         Write-Host "`nWIM mounted successfully."
     }
     catch {
-        Log-Error "Failed to mount WIM: $_"
+        Write-ErrorLog "Failed to mount WIM: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -371,9 +367,9 @@ function Add-Customizations {
         Write-Host "`nCustomizations added successfully."
     }
     catch {
-        Log-Error "Failed to add customizations: $_"
+        Write-ErrorLog "Failed to add customizations: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -416,9 +412,9 @@ function Add-Packages {
             Write-Host "Added package: $package"
         }
         catch {
-            Log-Error "Failed to add package $package`: $_"
+            Write-ErrorLog "Failed to add package $package`: $_"
             Cleanup
-            Script-Exit $false
+            Exit-Script $false
         }
     }
     Write-Host "`nPackages added successfully."
@@ -439,9 +435,9 @@ function Add-Services {
         Write-Host "Services configuration added successfully."
     }
     catch {
-        Log-Error "Failed to configure services: $_"
+        Write-ErrorLog "Failed to configure services: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -457,9 +453,9 @@ function Add-Drivers {
         Write-Host "`nDrivers added successfully."
     }
     catch {
-        Log-Error "Failed to add drivers: $_"
+        Write-ErrorLog "Failed to add drivers: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -470,9 +466,9 @@ function Set-ScratchSpace {
         Write-Host "`nScratch space set successfully."
     }
     catch {
-        Log-Error "Failed to set scratch space: $_"
+        Write-ErrorLog "Failed to set scratch space: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -483,8 +479,8 @@ function Commit-Wim {
         Write-Host "`nWIM changes applied successfully."
     }
     catch {
-        Log-Error "Failed to unmount WIM: $_"
-        Script-Exit $false
+        Write-ErrorLog "Failed to unmount WIM: $_"
+        Exit-Script $false
     }
 }
 
@@ -508,9 +504,9 @@ function Add-MediaFiles {
         Write-Host "`nMurrpTools media files added successfully."
     }
     catch {
-        Log-Error "Failed to add media files: $_"
+        Write-ErrorLog "Failed to add media files: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -522,9 +518,9 @@ function Add-DebloatTools {
     $outputJsonPath = Join-Path $setupDir "DebloatTools.json"
 
     if (-not (Test-Path $debloatToolsFile)) {
-        Log-Error "DebloatTools.json not found at $debloatToolsFile"
+        Write-ErrorLog "DebloatTools.json not found at $debloatToolsFile"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 
     if (-not (Test-Path $setupDir)) {
@@ -552,7 +548,7 @@ function Add-DebloatTools {
                 [string]::IsNullOrWhiteSpace($toolFilename) -or 
                 [string]::IsNullOrWhiteSpace($toolExecutable) -or 
                 [string]::IsNullOrWhiteSpace($toolFolder)) {
-                Log-Warning "Tool ($toolName) is not valid and has been skipped. Missing required fields for tool."
+                Write-WarningLog "Tool ($toolName) is not valid and has been skipped. Missing required fields for tool."
                 continue
             }
             $toolFolderPath = Join-Path $setupDir "$toolFolder"
@@ -581,7 +577,7 @@ function Add-DebloatTools {
                             Write-Host "Attempt $attempts failed. Retrying in 3 seconds..."
                             Start-Sleep -Seconds 3
                         } else {
-                            Log-Warning "Failed to download $toolFilename from $toolUrl after $maxAttempts attempts."
+                            Write-WarningLog "Failed to download $toolFilename from $toolUrl after $maxAttempts attempts."
                             Write-Host "Marking $toolName as unavailable for offline use."
                             $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
                         }
@@ -601,7 +597,7 @@ function Add-DebloatTools {
                         # Optionally, remove the zip file after extraction
                         Remove-Item $destinationPath -Force -Verbose:$verbose
                     } catch {
-                        Log-Warning "Failed to extract $toolFilename`nTool will not be available offline: $_"
+                        Write-WarningLog "Failed to extract $toolFilename`nTool will not be available offline: $_"
                         continue
                     }
                 }
@@ -612,7 +608,7 @@ function Add-DebloatTools {
                         Write-Host "Successfully downloaded and validated script for $toolName. Marking as available offline." -ForegroundColor Green
                         $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $true -Force
                     } else {
-                        Log-Warning "Downloaded script for $toolName is not a valid PowerShell script"
+                        Write-WarningLog "Downloaded script for $toolName is not a valid PowerShell script"
                         $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
                         if (Test-Path $toolScriptPath) {
                             Remove-Item $toolScriptPath -Force -Verbose:$verbose
@@ -622,14 +618,14 @@ function Add-DebloatTools {
                     Write-Host "Executable file downloaded for $toolName. Marking as available offline." -ForegroundColor Green
                     $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $true -Force
                 } else {
-                    Log-Warning "Downloaded file for $toolName is not a supported type"
+                    Write-WarningLog "Downloaded file for $toolName is not a supported type"
                     $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
                     if (Test-Path $toolScriptPath) {
                         Remove-Item $toolScriptPath -Force -Verbose:$verbose
                     }
                 }
             } catch {
-                Log-Warning "Failed to download or validate script for $toolName`: $_"
+                Write-WarningLog "Failed to download or validate script for $toolName`: $_"
                 if (Test-Path $toolFolderPath) {
                     Remove-Item $toolFolderPath -Recurse -Force -Verbose:$verbose
                 }
@@ -643,9 +639,9 @@ function Add-DebloatTools {
         $updatedTools | ConvertTo-Json -Depth 10 | Set-Content -Path $outputJsonPath -Encoding UTF8
         Write-Host "`nDebloat Tools configuration updated successfully."
     } catch {
-        Log-Error "Failed to add Debloat Tools: $_"
+        Write-ErrorLog "Failed to add Debloat Tools: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
@@ -665,16 +661,16 @@ function Build-MurrpToolsISO {
         Write-Host "`nMurrpTools_$MurrpToolsVersion.iso built at $MurrpToolsISOPath`n"
     }
     catch {
-        Log-Error "Failed to add media files: $_"
+        Write-ErrorLog "Failed to add media files: $_"
         Cleanup
-        Script-Exit $false
+        Exit-Script $false
     }
 }
 
 # Main script execution
 if (-not (Test-Admin)) {
-    Log-Error "This script must be run as administrator."
-    Script-Exit $false
+    Write-ErrorLog "This script must be run as administrator."
+    Exit-Script $false
 }
 
 if (!($ISOImage)) {
@@ -734,10 +730,10 @@ try {
     Write-Host "`nNote: If Rufus prompts with Windows User Experience (eg. Remove Requirements, Disable Bitlocker, etc.)`nPlease uncheck all options. Enabling options could cause MurrpTools to fail loading Debloat Tools.`nMurrpTools will already include those features built-in." -ForegroundColor Yellow
     Write-Host $border -ForegroundColor Cyan
     Write-Host ""
-    Script-Exit $true
+    Exit-Script $true
 }
 catch {
-    Log-Error "Build failed. Cleaning up..."
+    Write-ErrorLog "Build failed. Cleaning up..."
     Cleanup
-    Script-Exit $false
+    Exit-Script $false
 }
