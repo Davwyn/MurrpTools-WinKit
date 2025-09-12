@@ -46,6 +46,14 @@ $Script:ISOmountResult = $null
 $Script:ISOdriveLetter = $null
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
+# Check PowerShell version and refuse to run if not Windows PowerShell 5 due to compatibility issues with PowerShell 7
+if ($PSVersionTable.PSEdition -ne "Desktop" -or $PSVersionTable.PSVersion.Major -ne 5) {
+    Write-Host "This script can only run on Windows PowerShell 5." -ForegroundColor Yellow
+    Write-Host "Please use Windows PowerShell 5 and try again." -ForegroundColor Yellow
+    Read-Host -Prompt "Press enter to continue..."
+    exit 1
+}
+
 function Write-ErrorLog {
     param($message)
     $Script:errorLog += $message
@@ -124,11 +132,6 @@ function Cleanup {
             Write-ErrorLog "Failed to unmount ISO: $_"
         }
     }
-}
-
-function Test-Admin {
-    $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-    return $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
 function Initialize-Directories {    
@@ -668,7 +671,10 @@ function Build-MurrpToolsISO {
 }
 
 # Main script execution
-if (-not (Test-Admin)) {
+
+# Verify running as administrator
+$currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+if (-not ($currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     Write-ErrorLog "This script must be run as administrator."
     Exit-Script $false
 }

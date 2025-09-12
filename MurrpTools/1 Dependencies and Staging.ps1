@@ -43,6 +43,14 @@ $MurrpToolsVersion = "v1.0.0"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
+# Check PowerShell version and refuse to run if not Windows PowerShell 5 due to compatibility issues with PowerShell 7
+if ($PSVersionTable.PSEdition -ne "Desktop" -or $PSVersionTable.PSVersion.Major -ne 5) {
+    Write-Host "This script can only run on Windows PowerShell 5." -ForegroundColor Yellow
+    Write-Host "Please use Windows PowerShell 5 and try again." -ForegroundColor Yellow
+    Read-Host -Prompt "Press enter to continue..."
+    exit 1
+}
+
 function Join-PathImproved {
     param (
         [string]$Path1,
@@ -111,10 +119,6 @@ function Exit-Script {
     if ($Script:warningLog.Count -gt 0) {
         Write-Host "Warnings encountered:" -ForegroundColor Yellow
         $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
-    }
-    
-    if (Get-PSDrive -Name "BuildDrive" -ErrorAction SilentlyContinue) {
-        Remove-PSDrive -Name "BuildDrive" -Force -ErrorAction SilentlyContinue
     }
 
     if ($isSuccess) {
@@ -193,8 +197,23 @@ function Select-BuildLocation {
     if (-not $longPathEnabled) {
         $maxAllowedLength = 260 - 152
         if ($($BuildPath.Length) -gt $maxAllowedLength) {
-            Write-ErrorLog "The selected path is too long. Windows Long Path support is not enabled, and the total path length exceeds the allowed limit of $maxAllowedLength characters. Please enable Long Path support in Windows or select a shorter folder path.`nYou can enable Long Path Support in PowerShell as administrator by typing:`nSet-ItemProperty -Path `"HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem`" -Name `"LongPathsEnabled`" -Value 1 -PropertyType DWORD -Force`nand then restarting the computer."
-            Exit-Script $false
+            Write-Warning "The selected path is too long. Windows Long Path support is not enabled, and the total path length exceeds the allowed limit of $maxAllowedLength characters."
+            $userResponse = Read-Host "Would you like to enable Long Path support in Windows? This requires administrative privileges and a system restart. (Y/N)"
+            if ($userResponse -match '^[Yy]') {
+                try {
+                    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+                    Write-Host "Long Path support has been enabled in the Windows registry." -ForegroundColor Green
+                    Write-Host "Please restart your computer for the changes to take effect." -ForegroundColor Yellow
+                    Write-Host "Exiting script. Please rerun the script after restarting your computer." -ForegroundColor Cyan
+                    Exit-Script $true
+                } catch {
+                    Write-ErrorLog "Failed to enable Long Path support: $_"
+                    Exit-Script $false
+                }
+            } else {
+                Write-ErrorLog "The selected path is too long, and Long Path support is not enabled. Please enable Long Path support or select a shorter folder path."
+                Exit-Script $false
+            }
         }
     }
 
@@ -415,6 +434,13 @@ Write-Host "MurrpTools Dependencies and Staging" -ForegroundColor Green
 Write-Host "Version: $MurrpToolsVersion" -ForegroundColor Green
 Write-Host $border -ForegroundColor Cyan
 
+# Verify running as administrator
+$currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+if (-not ($currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
+    Write-ErrorLog "This script must be run as administrator."
+    Exit-Script $false
+}
+
 # Extract dependencies if they are not already extracted
 Expand-Dependencies
 
@@ -472,15 +498,15 @@ try {
 
 Write-Host "`nCopy operations completed. Review any warnings above if any.`n" -ForegroundColor Green
 Write-Host $border -ForegroundColor Cyan
-Write-Host "`nPlease now navigate to $(Join-PathImproved $(Get-PSDrive -Name "BuildDrive").Root 'MurrpTools') to continue building your Windows Image."
+Write-Host "`nPlease now navigate to $(Join-PathImproved $($BuildLocation) 'MurrpTools') to continue building your Windows Image."
 Write-Host "`nAdd any desired Windows PE Drivers to the WinPE_Drivers folder.`nIf you need help finding drivers, check the ReadMe file in that folder."
 Write-Host "`nYou can also enable or disable any desired Debloat Tools by editing the DebloatTools.json file in the MurrpTools folder."
 Write-Host "`n`nOnce you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
 if (!($BuildPath)) {
-    if ($(Get-PSDrive -Name "BuildDrive").Root -ne $MurrpToolsScriptPath) {
+    if ($BuildLocation -ne $MurrpToolsScriptPath) {
         Write-Host "`nPress any key to open the MurrpTools Build folder..."
         Read-Host -Prompt "Press enter to continue..."
-        Start-Process -FilePath "Explorer.exe" -ArgumentList $(Get-PSDrive -Name "BuildDrive").Root
+        Start-Process -FilePath "Explorer.exe" -ArgumentList $BuildLocation
         Exit-Script $true
     } else {
         Exit-Script $true
