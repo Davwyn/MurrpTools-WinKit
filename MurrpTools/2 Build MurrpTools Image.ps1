@@ -33,12 +33,28 @@ param (
     [string]$ISOImage
 )
 
+$MurrpToolsVersion = "v1.1.0 Dev"
+
+function Join-PathImproved {
+    param (
+        [string]$Path1,
+        [string]$Path2
+    )
+    try {
+        $CombinedPath = [System.IO.Path]::Combine($Path1, $Path2) # Must use this instead of Join-Path because Microsoft PowerShell's internal commands are garbage.
+        Write-Verbose "Combined path: $CombinedPath"
+        return $CombinedPath
+    } catch {
+        Write-ErrorLog "Failed to combine paths: $_"
+        Exit-Script $false
+    }
+}
+
 # Script-level variables
-$MurrpToolsVersion = "v1.0.0"
-$MurrpToolsScriptPath = Resolve-Path $PSScriptRoot
-$mountDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "mount"
-$bootMediaDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "BootMedia"
-$driversDir = Join-Path -Path $MurrpToolsScriptPath -ChildPath "WinPE_Drivers"
+$MurrpToolsScriptPath = Resolve-Path -LiteralPath $PSScriptRoot
+$mountDir = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "mount"
+$bootMediaDir = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "BootMedia"
+$driversDir = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "WinPE_Drivers"
 $Script:packageDir = $null
 $Script:errorLog = @()
 $Script:warningLog = @()
@@ -46,13 +62,41 @@ $Script:ISOmountResult = $null
 $Script:ISOdriveLetter = $null
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
-# Check PowerShell version and refuse to run if not Windows PowerShell 5 due to compatibility issues with PowerShell 7
-if ($PSVersionTable.PSEdition -ne "Desktop" -or $PSVersionTable.PSVersion.Major -ne 5) {
-    Write-Host "This script can only run on Windows PowerShell 5." -ForegroundColor Yellow
-    Write-Host "Please use Windows PowerShell 5 and try again." -ForegroundColor Yellow
+# Check if the operating system is Windows and refuse to run if not
+if ($env:OS -notlike "*Windows*") {
+    Write-Host "This script is designed to run only on Windows operating systems." -ForegroundColor Yellow
+    Write-Host "Please use a Windows system and try again." -ForegroundColor Yellow
     Read-Host -Prompt "Press enter to continue..."
     exit 1
 }
+
+# Check if Long Path support is enabled
+    $longPathEnabled = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -ErrorAction SilentlyContinue).LongPathsEnabled -eq 1
+    if (-not($longPathEnabled)) {
+        $maxAllowedLength = 260 - 152
+        if ($($MurrpToolsScriptPath.Length) -gt $maxAllowedLength) {
+            Write-Warning "MurrpTools is in a directory path that is too long. Windows Long Path support is not enabled, and the total path length exceeds the allowed limit of $maxAllowedLength characters."
+            $userResponse = Read-Host "Would you like to enable Long Path support in Windows? This requires administrative privileges and a system restart. (Y/N)"
+            if ($userResponse -match '^[Yy]') {
+                try {
+                    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -Type DWORD -Force
+                    Write-Host "Long Path support has been enabled in the Windows registry.`n`n" -ForegroundColor Green
+                    $border = "-" * 50
+                    Write-Host $border -ForegroundColor Yellow
+                    Write-Host "Please restart your computer for the changes to take effect.`nThis is required. Strange script errors will occur if you don't restart!" -ForegroundColor Yellow
+                    Write-Host $border -ForegroundColor Yellow
+                    Write-Host "`n`nExiting script. Please rerun the script after restarting your computer." -ForegroundColor Cyan
+                    Exit-Script $true
+                } catch {
+                    Write-ErrorLog "Failed to enable Long Path support: $_"
+                    Exit-Script $false
+                }
+            } else {
+                Write-ErrorLog "MurrpTools is in a directory path that is too long, and Long Path support is not enabled. Please enable Long Path support or select a shorter folder path."
+                Exit-Script $false
+            }
+        }
+    }
 
 function Write-ErrorLog {
     param($message)
@@ -111,9 +155,9 @@ function Cleanup {
     # 2. Delete directories with error handling
     $folders = @($mountDir, $bootMediaDir)
     foreach ($folder in $folders) {
-        if (Test-Path $folder) {
+        if (Test-Path -LiteralPath $folder) {
             try {
-                Remove-Item $folder -Recurse -Force -Verbose:$verbose
+                Remove-Item -LiteralPath $folder -Recurse -Force -Verbose:$verbose
                 Write-Host "Cleaned up folder: $folder"
             } catch {
                 Write-ErrorLog "Failed to remove $folder - please delete manually"
@@ -147,12 +191,35 @@ function Initialize-Directories {
     }
 }
 
-function Validate-ISO {
+function Get-NormalizedPath {
+    param ([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return $Path
+    }
+    # Strip \\?\ prefix if present
+    if ($Path -like "\\?\*") {
+        $Path = $Path.Substring(4)
+    }
+    # Check if it's a root path without trailing backslash
+    if ($Path -match '^[a-zA-Z]:$') {
+        return $([System.IO.Path]::GetFullPath($Path + "\"))
+    }
+    # Check if it's a root path like "C:\"
+    if ($Path -match '^[a-zA-Z]:\\+$') {
+        return $([System.IO.Path]::GetFullPath(($Path.TrimEnd('\')) + "\"))
+    }
+    return $([System.IO.Path]::GetFullPath($Path.TrimEnd('\')))
+}
+
+function Confirm-ValidISO {
     param (
         [string]$isoPath
     )
     
     try {
+        # Normalize the ISO path
+        $isoPath = Get-NormalizedPath $isoPath
+
         # Mount ISO
         $null = $mountResult = Mount-DiskImage -ImagePath $isoPath -PassThru
         $driveLetter = ($mountResult | Get-Volume).DriveLetter
@@ -161,21 +228,21 @@ function Validate-ISO {
         Start-Sleep -Seconds 1  # Allow mounting to settle
 
         # Check for installation files
-        if (-not (Test-Path "${driveLetter}:\sources\install.wim") -and 
-            -not (Test-Path "${driveLetter}:\sources\install.esd")) {
+        if (-not (Test-Path -LiteralPath "${driveLetter}:\sources\install.wim") -and 
+            -not (Test-Path -LiteralPath "${driveLetter}:\sources\install.esd")) {
             Dismount-DiskImage -InputObject $mountResult | Out-Null
             throw "ISO does not contain Windows installation files"
         }
 
         # Check for boot files
-        if (-not (Test-Path "${driveLetter}:\bootmgr") -or 
-            -not (Test-Path "${driveLetter}:\boot\bcd")) {
+        if (-not (Test-Path -LiteralPath "${driveLetter}:\bootmgr") -or 
+            -not (Test-Path -LiteralPath "${driveLetter}:\boot\bcd")) {
             Dismount-DiskImage -InputObject $mountResult | Out-Null
             throw "ISO missing required boot files"
         }
 
         # Retrieve Windows Image Info
-        $windowsImage = if (Test-Path "${driveLetter}:\sources\install.wim") {
+        $windowsImage = if (Test-Path -LiteralPath "${driveLetter}:\sources\install.wim") {
             Write-Host "Install WIM Path: ${driveLetter}:\sources\install.wim"
             Get-WindowsImage -ImagePath "${driveLetter}:\sources\install.wim" -Index 1
         } else {
@@ -200,10 +267,10 @@ function Validate-ISO {
 
         if (($currentVersion -ge $minVersionWin10) -and ($currentVersion -lt $minVersionWin11)) {
             Write-Host "Windows 10 22H2 detected." -ForegroundColor Green
-            $Script:packageDir = Join-Path $MurrpToolsScriptPath "Win10_WinPE_OCs"
+            $Script:packageDir = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "Win10_WinPE_OCs"
         } elseif ($currentVersion -ge $minVersionWin11) {
             Write-Host "Windows 11 or higher detected." -ForegroundColor Green
-            $Script:packageDir = Join-Path $MurrpToolsScriptPath "Win11_WinPE_OCs"
+            $Script:packageDir = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "Win11_WinPE_OCs"
         } else {
             Write-Host "Unsupported Windows version detected." -ForegroundColor Red
             Write-Host "Expected version: $minVersionWin10, $minVersionWin11 or higher" -ForegroundColor Red
@@ -225,8 +292,12 @@ function Copy-WithProgress {
     )
 
     try {
+        # Sanitize paths
+        $SourcePath = Get-NormalizedPath $SourcePath
+        $DestinationPath = Get-NormalizedPath $DestinationPath
+
         # Get all files to copy
-        $files = Get-ChildItem -Path $SourcePath -Recurse -File
+        $files = Get-ChildItem -LiteralPath $SourcePath -Recurse -File
         $totalFiles = $files.Count
         $currentFile = 0
 
@@ -237,12 +308,12 @@ function Copy-WithProgress {
 
             # Ensure the destination directory exists
             $destinationDir = Split-Path $destinationFile -Parent
-            if (-not (Test-Path $destinationDir)) {
+            if (-not (Test-Path -LiteralPath $destinationDir)) {
                 New-Item -ItemType Directory -Path $destinationDir -Force -Verbose:$verbose | Out-Null
             }
 
             # Copy the file
-            Copy-Item -Path $file.FullName -Destination $destinationFile -Force -Verbose:$verbose
+            Copy-Item -LiteralPath $file.FullName -Destination $destinationFile -Force -Verbose:$verbose
 
             # Update progress
             Write-Progress -Activity "Copying files..." `
@@ -265,7 +336,7 @@ function Build-Image {
     if ($ISOImage) {
         # Resolve the provided path
         try {
-            $ISOImage = Resolve-Path $ISOImage
+            $ISOImage = Resolve-Path -LiteralPath $ISOImage
             Write-Host "ISO Image supplied as: $ISOImage"
         } catch {
             Write-ErrorLog "Failed to resolve ISO path: $_"
@@ -273,7 +344,7 @@ function Build-Image {
             Exit-Script $false
         }
         # Use provided ISO path
-        if (-not (Test-Path $ISOImage)) {
+        if (-not (Test-Path -LiteralPath $ISOImage)) {
             Write-ErrorLog "Specified ISO file does not exist: $ISOImage"
             Cleanup
             Exit-Script $false
@@ -302,11 +373,11 @@ function Build-Image {
     try {
         # Validate ISO and get mount details
         Write-Host "`nValidating ISO file..."
-        $Script:ISOmountResult, $Script:ISOdriveLetter = Validate-ISO $isoFile.FullName
+        $Script:ISOmountResult, $Script:ISOdriveLetter = Confirm-ValidISO $isoFile.FullName
 
         # Create BootMedia folder
         Write-Host "Creating BootMedia directory"
-        if (-not (Test-Path $bootMediaDir)) {
+        if (-not (Test-Path -LiteralPath $bootMediaDir)) {
             New-Item -ItemType Directory -Path $bootMediaDir -Verbose:$verbose | Out-Null
         }
 
@@ -330,7 +401,7 @@ function Build-Image {
 
 function Mount-Wim {
     try {
-        $wimFile = "$bootMediaDir\sources\boot.wim"
+        $wimFile = Join-PathImproved -Path1 $bootMediaDir -Path2 "sources\boot.wim"
         Write-Host "`nMounting Boot WIM:`n$wimFile`nto`n$mountDir"
         attrib -R -S $wimFile >$null
         # Take ownership and grant full control
@@ -349,14 +420,17 @@ function Mount-Wim {
 function Add-Customizations {    
     try {
         Write-Host "`nAdding MurrpTools image customizations..."
+        # Normalize paths
+        $BootFilesDir = Get-NormalizedPath (Join-Path $MurrpToolsScriptPath "BootFiles")
+        $mountDir = Get-NormalizedPath $mountDir
+
         # Remove winpeshl.ini
-        Remove-Item "$mountDir\windows\system32\winpeshl.ini" -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath "$mountDir\windows\system32\winpeshl.ini" -Force -ErrorAction SilentlyContinue
         
         # Copy custom files with proper attribute handling
-        $BootFilesDir = Join-Path $MurrpToolsScriptPath "BootFiles"
-        Get-ChildItem -Path $BootFilesDir -Recurse | ForEach-Object {
+        Get-ChildItem -LiteralPath $BootFilesDir -Recurse | ForEach-Object {
             $destPath = $_.FullName.Replace($BootFilesDir, $mountDir)
-            if (Test-Path $destPath) {
+            if (Test-Path -LiteralPath $destPath) {
                 Write-Host "Destination $destPath exists.`n  Overwriting..."
                 # Remove read-only and system attributes
                 attrib -R -S $destPath >$null
@@ -364,7 +438,7 @@ function Add-Customizations {
                 takeown /F $destPath /A >$null
                 icacls $destPath /grant Administrators:F >$null
             }
-            Copy-Item $_.FullName $destPath -Force -Verbose:$verbose
+            Copy-Item -LiteralPath $_.FullName -Destination $destPath -Force -Verbose:$verbose
         }
         
         Write-Host "`nCustomizations added successfully."
@@ -429,7 +503,7 @@ function Add-Services {
     $appendFile = "$MurrpToolsScriptPath\ExtendedStartnetCommands.append"
     
     try {
-        if (-not (Test-Path $appendFile)) {
+        if (-not (Test-Path -LiteralPath $appendFile)) {
             throw "ExtendedStartnetCommands.append not found at $appendFile"
         }
         
@@ -475,7 +549,7 @@ function Set-ScratchSpace {
     }
 }
 
-function Commit-Wim {
+function Publish-WIMFile {
     try {
         Write-Host "`nApplying changes to Boot.wim file..."
         Dismount-WindowsImage -Path $mountDir -Save
@@ -491,10 +565,10 @@ function Add-MediaFiles {
     try {
         Write-Host "`nAdding MurrpTools media files..."        
         # Copy custom files with proper attribute handling
-        $MediaFilesDir = Join-Path $MurrpToolsScriptPath "MediaFiles"
+        $MediaFilesDir = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "MediaFiles"
         Get-ChildItem -Path $MediaFilesDir -Recurse | ForEach-Object {
             $destPath = $_.FullName.Replace($MediaFilesDir, $bootMediaDir)
-            if (Test-Path $destPath) {
+            if (Test-Path -LiteralPath $destPath) {
                 Write-Host "Destination $destPath exists. Overwriting it..."
                 # Remove read-only and system attributes
                 attrib -R -S $destPath >$null
@@ -502,8 +576,8 @@ function Add-MediaFiles {
                 takeown /F $destPath /A >$null
                 icacls $destPath /grant Administrators:F >$null
             }
-            Copy-Item $_.FullName $destPath -Force -Verbose:$verbose
-        }        
+            Copy-Item -LiteralPath $_.FullName -Destination $destPath -Force -Verbose:$verbose
+        }
         Write-Host "`nMurrpTools media files added successfully."
     }
     catch {
@@ -516,17 +590,17 @@ function Add-MediaFiles {
 function Add-DebloatTools {
     Write-Host "`nAdding Debloat Tools..."
 
-    $debloatToolsFile = Join-Path $MurrpToolsScriptPath "DebloatTools.json"
-    $setupDir = Join-Path  $bootMediaDir "`$OEM`$\`$1\DebloatTools"
-    $outputJsonPath = Join-Path $setupDir "DebloatTools.json"
+    $debloatToolsFile = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "DebloatTools.json"
+    $setupDir = Join-PathImproved -Path1 $bootMediaDir -Path2 "`$OEM`$\`$1\DebloatTools"
+    $outputJsonPath = Join-PathImproved -Path1 $setupDir -Path2 "DebloatTools.json"
 
-    if (-not (Test-Path $debloatToolsFile)) {
+    if (-not (Test-Path -LiteralPath $debloatToolsFile)) {
         Write-ErrorLog "DebloatTools.json not found at $debloatToolsFile"
         Cleanup
         Exit-Script $false
     }
 
-    if (-not (Test-Path $setupDir)) {
+    if (-not (Test-Path -LiteralPath $setupDir)) {
         New-Item -ItemType Directory -Path $setupDir -Force -Verbose:$verbose | Out-Null
     }
 
@@ -554,8 +628,8 @@ function Add-DebloatTools {
                 Write-WarningLog "Tool ($toolName) is not valid and has been skipped. Missing required fields for tool."
                 continue
             }
-            $toolFolderPath = Join-Path $setupDir "$toolFolder"
-            $toolScriptPath = Join-Path $setupDir "$toolFolder\$toolExecutable"
+            $toolFolderPath = Join-PathImproved -Path1 $setupDir -Path2 "$toolFolder"
+            $toolScriptPath = Join-PathImproved -Path1 $setupDir -Path2 "$toolFolder\$toolExecutable"
 
             Write-Host "`nFetching script for tool: $toolName`nFrom: $toolUrl"
             # Download the script or tool from the download URL
@@ -598,7 +672,7 @@ function Add-DebloatTools {
                         Expand-Archive -Path $destinationPath -DestinationPath $toolFolderPath -Force
                         Write-Host "Extracted $toolFilename successfully."
                         # Optionally, remove the zip file after extraction
-                        Remove-Item $destinationPath -Force -Verbose:$verbose
+                        Remove-Item -LiteralPath $destinationPath -Force -Verbose:$verbose
                     } catch {
                         Write-WarningLog "Failed to extract $toolFilename`nTool will not be available offline: $_"
                         continue
@@ -613,8 +687,8 @@ function Add-DebloatTools {
                     } else {
                         Write-WarningLog "Downloaded script for $toolName is not a valid PowerShell script"
                         $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
-                        if (Test-Path $toolScriptPath) {
-                            Remove-Item $toolScriptPath -Force -Verbose:$verbose
+                        if (Test-Path -LiteralPath $toolScriptPath) {
+                            Remove-Item -LiteralPath $toolScriptPath -Force -Verbose:$verbose
                         }
                     }
                 } elseif ($fileExtension -in ".exe", ".cmd", ".bat") {
@@ -623,14 +697,14 @@ function Add-DebloatTools {
                 } else {
                     Write-WarningLog "Downloaded file for $toolName is not a supported type"
                     $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
-                    if (Test-Path $toolScriptPath) {
-                        Remove-Item $toolScriptPath -Force -Verbose:$verbose
+                    if (Test-Path -LiteralPath $toolScriptPath) {
+                        Remove-Item -LiteralPath $toolScriptPath -Force -Verbose:$verbose
                     }
                 }
             } catch {
                 Write-WarningLog "Failed to download or validate script for $toolName`: $_"
-                if (Test-Path $toolFolderPath) {
-                    Remove-Item $toolFolderPath -Recurse -Force -Verbose:$verbose
+                if (Test-Path -LiteralPath $toolFolderPath) {
+                    Remove-Item -LiteralPath $toolFolderPath -Recurse -Force -Verbose:$verbose
                 }
                 $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $false -Force
             }
@@ -651,13 +725,13 @@ function Add-DebloatTools {
 function Build-MurrpToolsISO {
     try {
         Write-Host "`nBuilding MurrpTools ISO Image..."
-        $oscdimg = Join-Path $MurrpToolsScriptPath "oscdimg.exe"
-        $MurrpToolsISOPath = Join-Path $MurrpToolsScriptPath "MurrpTools.iso"
-        if (Test-Path $MurrpToolsISOPath) { 
+        $oscdimg = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "oscdimg.exe"
+        $MurrpToolsISOPath = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "MurrpTools.iso"
+        if (Test-Path -LiteralPath $MurrpToolsISOPath) { 
             Write-Host "Removing existing MurrpTools.iso file"
-            Remove-Item $MurrpToolsISOPath -Force -ErrorAction Stop -Verbose:$verbose
+            Remove-Item -LiteralPath $MurrpToolsISOPath -Force -ErrorAction Stop -Verbose:$verbose
         }
-        if (!(Test-Path $oscdimg)) {
+        if (!(Test-Path -LiteralPath $oscdimg)) {
             throw "$oscdimg is missing. Unable to create ISO file."
         }
         Start-Process -FilePath $oscdimg -ArgumentList "-bootdata:2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`" -o -m -u2 -udfver102 -lMurrpTools_$MurrpToolsVersion `"$bootMediaDir`" `"MurrpTools_$MurrpToolsVersion.iso`"" -Wait -NoNewWindow -ErrorAction Stop -Verbose:$verbose
@@ -717,7 +791,7 @@ try {
     Write-Verbose "Set Scratchspace"
     Set-ScratchSpace
     Write-Verbose "Unmount WIM"
-    Commit-Wim
+    Publish-WIMFile
     Start-Sleep 1
     Write-Verbose "Build MurrpTools ISO"
     Build-MurrpToolsISO

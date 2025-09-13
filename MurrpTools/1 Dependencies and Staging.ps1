@@ -39,14 +39,14 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v1.0.0"
+$MurrpToolsVersion = "v1.1.0 Dev"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
-# Check PowerShell version and refuse to run if not Windows PowerShell 5 due to compatibility issues with PowerShell 7
-if ($PSVersionTable.PSEdition -ne "Desktop" -or $PSVersionTable.PSVersion.Major -ne 5) {
-    Write-Host "This script can only run on Windows PowerShell 5." -ForegroundColor Yellow
-    Write-Host "Please use Windows PowerShell 5 and try again." -ForegroundColor Yellow
+# Check if the operating system is Windows and refuse to run if not
+if ($env:OS -notlike "*Windows*") {
+    Write-Host "This script is designed to run only on Windows operating systems." -ForegroundColor Yellow
+    Write-Host "Please use a Windows system and try again." -ForegroundColor Yellow
     Read-Host -Prompt "Press enter to continue..."
     exit 1
 }
@@ -69,28 +69,27 @@ function Join-PathImproved {
 # Normalize paths for accurate comparison, removing \\?\ prefix if present
 function Get-NormalizedPath {
     param ([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return $Path
+    }
+    # Strip \\?\ prefix if present
     if ($Path -like "\\?\*") {
-        $NewPath = $Path.Substring(4)
-        return [System.IO.Path]::GetFullPath($NewPath.TrimEnd('\'))
+        $Path = $Path.Substring(4)
+    }
+    # Check if it's a root path without trailing backslash
+    if ($Path -match '^[a-zA-Z]:$') {
+        return $([System.IO.Path]::GetFullPath($Path + "\"))
     }
     # Check if it's a root path like "C:\"
-    if ($Path -match '^[a-zA-Z]:\\$') {
-        return [System.IO.Path]::GetFullPath($Path)
+    if ($Path -match '^[a-zA-Z]:\\+$') {
+        return $([System.IO.Path]::GetFullPath(($Path.TrimEnd('\')) + "\"))
     }
-    return [System.IO.Path]::GetFullPath($Path.TrimEnd('\'))
-}
-
-function Get-LongPath {
-    param ([string]$Path)
-    if ($Path -notlike "\\?\*") {
-        return "\\?\$Path"
-    }
-    return $Path
+    return $([System.IO.Path]::GetFullPath($Path.TrimEnd('\')))
 }
 
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
-$MurrpToolsScriptPath = (Resolve-Path $PSScriptRoot -ErrorAction Stop | Select-Object -ExpandProperty ProviderPath)
+$MurrpToolsScriptPath = (Resolve-Path -LiteralPath $PSScriptRoot -ErrorAction Stop | Select-Object -ExpandProperty ProviderPath)
 $ProjectRootPath = Split-Path $MurrpToolsScriptPath -Parent
 
 # Function Definitions
@@ -137,7 +136,7 @@ function Write-CompletionFile {
         [string]$Path
     )
     $completionFile = Join-PathImproved $Path "1 Dependencies and Staging Complete.txt"
-    if (!(Test-Path $Path)) {
+    if (!(Test-Path -LiteralPath $Path)) {
         New-Item -ItemType Directory -Path $Path -ErrorAction Stop -Verbose:$verbose | Out-Null
     }
     "Dependencies and Staging step is already complete." | Out-File $completionFile
@@ -150,10 +149,9 @@ function Copy-MurrpTools {
         [bool]$Verbose = $false
     )
 
-    # Ensure source path uses the \\?\ prefix
-    $SourcePath = Get-LongPath $SourcePath
-    # Ensure destination path uses the \\?\ prefix
-    $DestinationPath = Get-LongPath $DestinationPath
+    # Santize paths
+    $SourcePath = Get-NormalizedPath $SourcePath
+    $DestinationPath = Get-NormalizedPath $DestinationPath
     
     $copyParams = @{
         LiteralPath = "$SourcePath"
@@ -181,7 +179,7 @@ function Select-BuildLocation {
         $BuildPath
     )
     
-    if (-not (Test-Path $BuildPath -ErrorAction SilentlyContinue)) {
+    if (-not (Test-Path -LiteralPath $BuildPath -ErrorAction SilentlyContinue)) {
         Write-ErrorLog "Path does not exist: $BuildPath"
         Exit-Script $false
     }
@@ -193,18 +191,20 @@ function Select-BuildLocation {
     
     # Check if Long Path support is enabled
     $longPathEnabled = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -ErrorAction SilentlyContinue).LongPathsEnabled -eq 1
-
-    if (-not $longPathEnabled) {
+    if (-not($longPathEnabled)) {
         $maxAllowedLength = 260 - 152
         if ($($BuildPath.Length) -gt $maxAllowedLength) {
             Write-Warning "The selected path is too long. Windows Long Path support is not enabled, and the total path length exceeds the allowed limit of $maxAllowedLength characters."
             $userResponse = Read-Host "Would you like to enable Long Path support in Windows? This requires administrative privileges and a system restart. (Y/N)"
             if ($userResponse -match '^[Yy]') {
                 try {
-                    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-                    Write-Host "Long Path support has been enabled in the Windows registry." -ForegroundColor Green
-                    Write-Host "Please restart your computer for the changes to take effect." -ForegroundColor Yellow
-                    Write-Host "Exiting script. Please rerun the script after restarting your computer." -ForegroundColor Cyan
+                    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -Type DWORD -Force
+                    Write-Host "Long Path support has been enabled in the Windows registry.`n`n" -ForegroundColor Green
+                    $border = "-" * 50
+                    Write-Host $border -ForegroundColor Yellow
+                    Write-Host "Please restart your computer for the changes to take effect.`nThis is required. Strange script errors will occur if you don't restart!" -ForegroundColor Yellow
+                    Write-Host $border -ForegroundColor Yellow
+                    Write-Host "`n`nExiting script. Please rerun the script after restarting your computer." -ForegroundColor Cyan
                     Exit-Script $true
                 } catch {
                     Write-ErrorLog "Failed to enable Long Path support: $_"
@@ -292,13 +292,13 @@ function Copy-Items {
         [array]$SourcePaths,
         [bool]$Verbose = $false
     )
-    
-    # Ensure destination path uses the \\?\ prefix
-    $Destination = Get-LongPath $Destination
-        
+
+    # Sanitize destination path
+    $Destination = Get-NormalizedPath $Destination
+
     # Create destination directory if it doesn't exist
     try {
-        if (-not (Test-Path $Destination)) {
+        if (-not (Test-Path -LiteralPath $Destination)) {
             New-Item -ItemType Directory -Path $Destination -ErrorAction Stop -Verbose:$verbose | Out-Null
         }
     }
@@ -309,9 +309,9 @@ function Copy-Items {
 
     $CopyErrors = @()
     foreach ($Source in $SourcePaths) {
-        # Ensure source path uses the \\?\ prefix
-        $Source = Get-LongPath $Source
-        if (Test-Path $Source) {
+        # Sanitize source path
+        $Source = Get-NormalizedPath $Source
+        if (Test-Path -LiteralPath $Source) {
             try {
                 $copyParams = @{
                     LiteralPath = $Source
@@ -344,12 +344,12 @@ function Expand-Dependencies {
     $ArchivePath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\Dependencies.7z.001")
     $ExtractTo = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies")
 
-    if (Test-Path $ArchivePath) {
+    if (Test-Path -LiteralPath $ArchivePath) {
         Write-Host "`nThe dependencies have not yet been extracted. Press enter to extract them now." -ForegroundColor Yellow
         Read-Host -Prompt "Press enter to continue..."
         
         Write-Host "`nFound dependencies archive: $ArchivePath. Extracting contents..." -ForegroundColor Yellow
-        if (Test-Path $7ZipPath) {
+        if (Test-Path -LiteralPath $7ZipPath) {
             Write-Host "7-Zip found at: $7ZipPath" -ForegroundColor Green
         } else {
             Write-ErrorLog "7-Zip not found at $7ZipPath. This is a required dependency."
@@ -417,7 +417,7 @@ $BuildSource_DebloatTools = @(
 ) | ForEach-Object { Join-PathImproved $ProjectRootPath $_ }
 
 # Add D.A.R.T components if available
-if (Test-Path "$ProjectRootPath\Dependencies\Microsoft\DART") {
+if (Test-Path -LiteralPath "$ProjectRootPath\Dependencies\Microsoft\DART") {
     $BuildSource_BootFiles = @(
         "Dependencies\Microsoft\DART\sources",
         "Dependencies\Microsoft\DART\Windows"
