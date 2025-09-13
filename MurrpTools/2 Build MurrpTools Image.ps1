@@ -70,34 +70,6 @@ if ($env:OS -notlike "*Windows*") {
     exit 1
 }
 
-# Check if Long Path support is enabled
-    $longPathEnabled = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -ErrorAction SilentlyContinue).LongPathsEnabled -eq 1
-    if (-not($longPathEnabled)) {
-        $maxAllowedLength = 260 - 152
-        if ($($MurrpToolsScriptPath.Length) -gt $maxAllowedLength) {
-            Write-Warning "MurrpTools is in a directory path that is too long. Windows Long Path support is not enabled, and the total path length exceeds the allowed limit of $maxAllowedLength characters."
-            $userResponse = Read-Host "Would you like to enable Long Path support in Windows? This requires administrative privileges and a system restart. (Y/N)"
-            if ($userResponse -match '^[Yy]') {
-                try {
-                    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -Type DWORD -Force
-                    Write-Host "Long Path support has been enabled in the Windows registry.`n`n" -ForegroundColor Green
-                    $border = "-" * 50
-                    Write-Host $border -ForegroundColor Yellow
-                    Write-Host "Please restart your computer for the changes to take effect.`nThis is required. Strange script errors will occur if you don't restart!" -ForegroundColor Yellow
-                    Write-Host $border -ForegroundColor Yellow
-                    Write-Host "`n`nExiting script. Please rerun the script after restarting your computer." -ForegroundColor Cyan
-                    Exit-Script $true
-                } catch {
-                    Write-ErrorLog "Failed to enable Long Path support: $_"
-                    Exit-Script $false
-                }
-            } else {
-                Write-ErrorLog "MurrpTools is in a directory path that is too long, and Long Path support is not enabled. Please enable Long Path support or select a shorter folder path."
-                Exit-Script $false
-            }
-        }
-    }
-
 function Write-ErrorLog {
     param($message)
     $Script:errorLog += $message
@@ -750,6 +722,47 @@ function Build-MurrpToolsISO {
 $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not ($currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     Write-ErrorLog "This script must be run as administrator."
+    Exit-Script $false
+}
+
+# Check if Long Path support is enabled
+$longPathEnabled = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -ErrorAction SilentlyContinue).LongPathsEnabled -eq 1
+if (-not($longPathEnabled)) {
+    $maxAllowedLength = 260 - 152
+    if ($($MurrpToolsScriptPath.Length) -gt $maxAllowedLength) {
+        Write-Warning "MurrpTools is in a directory path that is too long. Windows Long Path support is not enabled, and the total path length exceeds the allowed limit of $maxAllowedLength characters."
+        $userResponse = Read-Host "Would you like to enable Long Path support in Windows? This requires administrative privileges and a system restart. (Y/N)"
+        if ($userResponse -match '^[Yy]') {
+            try {
+                Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -Type DWORD -Force
+                Write-Host "Long Path support has been enabled in the Windows registry.`n`n" -ForegroundColor Green
+                $border = "-" * 50
+                Write-Host $border -ForegroundColor Yellow
+                Write-Host "Please restart your computer for the changes to take effect.`nThis is required. Strange script errors will occur if you don't restart!" -ForegroundColor Yellow
+                Write-Host $border -ForegroundColor Yellow
+                Write-Host "`n`nExiting script. Please rerun the script after restarting your computer." -ForegroundColor Cyan
+                Exit-Script $true
+            } catch {
+                Write-ErrorLog "Failed to enable Long Path support: $_"
+                Exit-Script $false
+            }
+        } else {
+            Write-ErrorLog "MurrpTools is in a directory path that is too long, and Long Path support is not enabled. Please enable Long Path support or select a shorter folder path."
+            Exit-Script $false
+        }
+    }
+}
+
+# Check if step 1 completion token file exists
+$TokenFile = Join-PathImproved $MurrpToolsScriptPath "1 Dependencies and Staging Complete.txt"
+if (-not(Test-Path -LiteralPath $TokenFile)) {
+    $border = "-" * 80
+    Write-Host $border -ForegroundColor Yellow
+    Write-Host ""
+    Write-ErrorLog "Step 1: Dependencies and Staging completion token file not found." -ForegroundColor Red
+    Write-Host "`nPlease run '1 Dependencies and Staging.cmd' first to complete the required staging before building the image." -ForegroundColor Yellow
+    Write-Host "If you already ran the first script you need to navigate to the MurrpTools folder you created in step 1.`n" -ForegroundColor Yellow
+    Write-Host $border -ForegroundColor Yellow
     Exit-Script $false
 }
 

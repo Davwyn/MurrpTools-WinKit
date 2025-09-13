@@ -136,10 +136,7 @@ function Write-CompletionFile {
         [string]$Path
     )
     $completionFile = Join-PathImproved $Path "1 Dependencies and Staging Complete.txt"
-    if (!(Test-Path -LiteralPath $Path)) {
-        New-Item -ItemType Directory -Path $Path -ErrorAction Stop -Verbose:$verbose | Out-Null
-    }
-    "Dependencies and Staging step is already complete." | Out-File $completionFile
+    "Dependencies and Staging step is complete.`nYou can now run `"2 Build MurrpTools Image.cmd`" to build the MurrpTools image." | Out-File $completionFile
 }
 
 function Copy-MurrpTools {
@@ -228,8 +225,6 @@ function Select-BuildLocation {
         $BuildPath = Join-PathImproved $BuildPath "MurrpTools"
         # Copy MurrpTools as it's a different location
         Copy-MurrpTools -SourcePath $MurrpToolsScriptPath -DestinationPath $BuildPath
-        # Create completion file if location is different from script directory
-        Write-CompletionFile -Path $BuildPath
     }
     Write-Host "BuildDrive set to: $BuildPath" -ForegroundColor Magenta
     return $BuildPath
@@ -495,6 +490,8 @@ try {
     Write-ErrorLog "Failed to copy dependencies: $_"
     Exit-Script $false
 }
+
+Write-CompletionFile -Path $BuildLocation
 
 Write-Host "`nCopy operations completed. Review any warnings above if any.`n" -ForegroundColor Green
 Write-Host $border -ForegroundColor Cyan
