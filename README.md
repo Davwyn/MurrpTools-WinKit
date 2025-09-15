@@ -98,6 +98,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    or to build in a specific folder:
    ```powershell
    Set-ExecutionPolicy Bypass -Scope Process
+   # Murrptools creates a "MurrpTools" sub-directory at your BuildPath. You must select an existing directory.
    & ".\MurrpTools\1 Dependencies and Staging.ps1" -BuildPath C:\Build
    ```
    In which you replace C:\Build with the path you'd like to build the project.
