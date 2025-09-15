@@ -84,7 +84,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    1. Go into the MurrpTools folder
    2. Find "1 Dependencies and Staging.cmd" in the folder
    3. You might need to right-click on the file and go into 'Properties'. If there is an 'Unblock' button push it. Otherwise just click OK.
-   4. Double-click the file to run it
+   4. Right-click the file and select "Run as Administrator"
    5. Click "Yes" if asked for permission
 
    💻 **-PowerShell Method (for advanced users)-**

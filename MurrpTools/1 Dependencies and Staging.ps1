@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v1.1.0 Dev"
+$MurrpToolsVersion = "v1.1.0"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
@@ -89,7 +89,7 @@ function Get-NormalizedPath {
 
 # Initialize script file path
 $ScriptFileName = $MyInvocation.MyCommand.Name
-$MurrpToolsScriptPath = (Resolve-Path -LiteralPath $PSScriptRoot -ErrorAction Stop | Select-Object -ExpandProperty ProviderPath)
+$MurrpToolsScriptPath = (Resolve-Path -Path $PSScriptRoot -ErrorAction Stop | Select-Object -ExpandProperty ProviderPath)
 $ProjectRootPath = Split-Path $MurrpToolsScriptPath -Parent
 
 # Function Definitions
@@ -151,7 +151,7 @@ function Copy-MurrpTools {
     $DestinationPath = Get-NormalizedPath $DestinationPath
     
     $copyParams = @{
-        LiteralPath = "$SourcePath"
+        Path = "$SourcePath"
         Destination = $DestinationPath.TrimEnd('\') + '\'
         Recurse = $true
         Force = $true
@@ -176,7 +176,7 @@ function Select-BuildLocation {
         $BuildPath
     )
     
-    if (-not (Test-Path -LiteralPath $BuildPath -ErrorAction SilentlyContinue)) {
+    if (-not (Test-Path -Path $BuildPath -ErrorAction SilentlyContinue)) {
         Write-ErrorLog "Path does not exist: $BuildPath"
         Exit-Script $false
     }
@@ -247,7 +247,7 @@ function Get-BuildLocation {
     Write-Host "`n`nThis script will copy all dependencies to the MurrpTools project folder, or MurrpTools with dependencies installed to a different location." -ForegroundColor Cyan
     Write-Host "`nPlease select one of the options below to prepare MurrpTools for building images."
     Write-Host "Option 1: Use current location ($(Get-NormalizedPath $MurrpToolsScriptPath))"
-    Write-Host "Option 2: Select a different using Folder Picker"
+    Write-Host "Option 2: Select a different using Folder Picker. A new MurrpTools folder will be created there."
     $choice = Read-Host "`nEnter choice (1 or 2)"
     
     if ($choice -eq "1") {
@@ -293,7 +293,7 @@ function Copy-Items {
 
     # Create destination directory if it doesn't exist
     try {
-        if (-not (Test-Path -LiteralPath $Destination)) {
+        if (-not (Test-Path -Path $Destination)) {
             New-Item -ItemType Directory -Path $Destination -ErrorAction Stop -Verbose:$verbose | Out-Null
         }
     }
@@ -306,17 +306,17 @@ function Copy-Items {
     foreach ($Source in $SourcePaths) {
         # Sanitize source path
         $Source = Get-NormalizedPath $Source
-        if (Test-Path -LiteralPath $Source) {
+        if (Test-Path -Path $Source) {
             try {
                 $copyParams = @{
-                    LiteralPath = $Source
+                    Path = $Source
                     Destination = $Destination.TrimEnd('\') + '\'
                     Recurse = $true
                     Force = $true
                     Verbose = $verbose
                 }
+                Write-Host "`nCopying $Source`nTo $Destination"
                 Copy-Item @copyParams -ErrorAction Stop
-                Write-Host "`nCopied $Source`nTo $Destination"
             }
             catch {
                 Write-WarningLog "Failed to copy $Source`: $_"
@@ -339,12 +339,12 @@ function Expand-Dependencies {
     $ArchivePath = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies\Dependencies.7z.001")
     $ExtractTo = [System.IO.Path]::GetFullPath("$ProjectRootPath\Dependencies")
 
-    if (Test-Path -LiteralPath $ArchivePath) {
-        Write-Host "`nThe dependencies have not yet been extracted. Press enter to extract them now." -ForegroundColor Yellow
-        Read-Host -Prompt "Press enter to continue..."
+    if (Test-Path -Path $ArchivePath) {
+        Write-Host "`nThe dependencies have not yet been extracted. Please wait as they're automatically unpacked." -ForegroundColor Yellow
+        Start-Sleep -Seconds 4
         
         Write-Host "`nFound dependencies archive: $ArchivePath. Extracting contents..." -ForegroundColor Yellow
-        if (Test-Path -LiteralPath $7ZipPath) {
+        if (Test-Path -Path $7ZipPath) {
             Write-Host "7-Zip found at: $7ZipPath" -ForegroundColor Green
         } else {
             Write-ErrorLog "7-Zip not found at $7ZipPath. This is a required dependency."
@@ -357,8 +357,8 @@ function Expand-Dependencies {
                 Write-Host "`nExtraction completed successfully." -ForegroundColor Green
 
                 # Delete all matching archive parts
-                Get-ChildItem -LiteralPath $ExtractTo -Filter "Dependencies.7z.*" | ForEach-Object {
-                    Remove-Item -LiteralPath $_.FullName -Force -Verbose:$verbose
+                Get-ChildItem -Path $ExtractTo -Filter "Dependencies.7z.*" | ForEach-Object {
+                    Remove-Item -Path $_.FullName -Force -Verbose:$verbose
                 }
                 Write-Host "`nCleaned up dependency archives." -ForegroundColor Green
             } else {
@@ -396,8 +396,11 @@ $BuildSource_ProgramFiles = @(
     "Dependencies\VideoLAN\VLC"
 ) | ForEach-Object { Join-PathImproved $ProjectRootPath $_ }
 
+$BuildSource_Windows = @(
+    "Dependencies\Microsoft\System32\"
+) | ForEach-Object { Join-PathImproved $ProjectRootPath $_ }
+
 $BuildSource_System32 = @(
-    "Dependencies\Microsoft\System32",
     "Dependencies\Dell\CCTK",
     "Dependencies\Explorer++\Explorer++.exe",
     "Dependencies\LaunchBar\LaunchBar_x64.exe",
@@ -412,7 +415,7 @@ $BuildSource_DebloatTools = @(
 ) | ForEach-Object { Join-PathImproved $ProjectRootPath $_ }
 
 # Add D.A.R.T components if available
-if (Test-Path -LiteralPath "$ProjectRootPath\Dependencies\Microsoft\DART") {
+if (Test-Path -Path "$ProjectRootPath\Dependencies\Microsoft\DART") {
     $BuildSource_BootFiles = @(
         "Dependencies\Microsoft\DART\sources",
         "Dependencies\Microsoft\DART\Windows"
@@ -442,7 +445,7 @@ Expand-Dependencies
 Write-Host "`nValidating expected files..." -ForegroundColor Yellow
 # Validate all source paths
 $missingPaths = @()
-$allSourcePaths = $BuildSource_Root + $BuildSource_ProgramFiles + $BuildSource_System32 + $BuildSource_DebloatTools + $BuildSource_BootFiles
+$allSourcePaths = $BuildSource_Root + $BuildSource_ProgramFiles + $BuildSource_Windows + $BuildSource_System32 + $BuildSource_DebloatTools + $BuildSource_BootFiles
 
 foreach ($path in $allSourcePaths) {
     if ($path -and -not (Test-Path $path)) {
@@ -466,6 +469,7 @@ $BuildLocation = Get-BuildLocation
 Write-Host "`nPreparing to copy dependencies to BuildDrive: $BuildLocation" -ForegroundColor Yellow
 $BuildDest_Root = $BuildLocation
 $BuildDest_ProgramFiles = Join-PathImproved $BuildLocation "BootFiles\Program Files"
+$BuildDest_Windows = Join-PathImproved $BuildLocation "BootFiles\Windows"
 $BuildDest_System32 = Join-PathImproved $BuildLocation "BootFiles\Windows\System32"
 $BuildDest_DebloatTools = Join-PathImproved $BuildLocation "MediaFiles\`$OEM`$\`$1\DebloatTools"
 $BuildDest_BootFiles = Join-PathImproved $BuildLocation "BootFiles"
@@ -478,6 +482,8 @@ try {
     Copy-Items -Destination $BuildDest_Root -SourcePaths $BuildSource_Root -Verbose:$verbose -ErrorAction Stop    
     # Copy custom program files
     Copy-Items -Destination $BuildDest_ProgramFiles -SourcePaths $BuildSource_ProgramFiles -Verbose:$verbose -ErrorAction Stop
+    # Windows directory files
+    Copy-Items -Destination $BuildDest_Windows -SourcePaths $BuildSource_Windows -Verbose:$verbose -ErrorAction Stop
     # Copy system32 files
     Copy-Items -Destination $BuildDest_System32 -SourcePaths $BuildSource_System32 -Verbose:$verbose -ErrorAction Stop
     # Copy Media files
