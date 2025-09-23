@@ -204,6 +204,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
   - Lord Flame Stryke
   - Kehvarl
   - Talonius
+  - Lirg
 
 ## Message to Debloat Tool Developers
 If you are interested in adding your Debloat Tool to MurrpTools, please read the "Developers of Debloat Tools ReadMe.md" file in this repo.

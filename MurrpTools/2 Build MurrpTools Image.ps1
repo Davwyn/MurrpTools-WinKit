@@ -33,7 +33,7 @@ param (
     [string]$ISOImage
 )
 
-$MurrpToolsVersion = "v1.1.0"
+$MurrpToolsVersion = "v1.1.1"
 
 function Join-PathImproved {
     param (
@@ -376,10 +376,10 @@ function Mount-Wim {
     try {
         $wimFile = Join-PathImproved -Path1 $bootMediaDir -Path2 "sources\boot.wim"
         Write-Host "`nMounting Boot WIM:`n$wimFile`nto`n$mountDir"
-        attrib -R -S $wimFile >$null
+        & attrib -R -S $wimFile >$null
         # Take ownership and grant full control
-        takeown /F $wimFile /A >$null
-        icacls $wimFile /grant Administrators:F >$null
+        & takeown /F $wimFile /A >$null
+        & icacls $wimFile /grant "*S-1-5-32-544:F" /Q
         Mount-WindowsImage -ImagePath $wimFile -Path $mountDir -Index 2 -verbose | Out-Null
         Write-Host "`nWIM mounted successfully."
     }
@@ -406,10 +406,10 @@ function Add-Customizations {
             if (Test-Path -Path $destPath) {
                 Write-Host "Destination $destPath exists.`n  Overwriting..."
                 # Remove read-only and system attributes
-                attrib -R -S $destPath >$null
+                & attrib -R -S $destPath >$null
                 # Take ownership and grant full control
-                takeown /F $destPath /A >$null
-                icacls $destPath /grant Administrators:F >$null
+                & takeown /F $destPath /A >$null
+                & icacls $destPath /grant "*S-1-5-32-544:F" /Q
             }
             Copy-Item -Path $_.FullName -Destination $destPath -Force -Verbose:$verbose
         }
@@ -512,7 +512,7 @@ function Add-Drivers {
 function Set-ScratchSpace {
     Write-Host "`nSetting WinPE Scratch Space to 512MB..."
     try {
-        Start-Process "dism.exe" -ArgumentList "/image:$mountDir /Set-ScratchSpace:512" -Wait -NoNewWindow
+        Start-Process "dism.exe" -ArgumentList "/image:`"$mountDir`" /Set-ScratchSpace:512" -Wait -NoNewWindow -ErrorAction Stop
         Write-Host "`nScratch space set successfully."
     }
     catch {
@@ -544,10 +544,10 @@ function Add-MediaFiles {
             if (Test-Path -Path $destPath) {
                 Write-Host "Destination $destPath exists. Overwriting it..."
                 # Remove read-only and system attributes
-                attrib -R -S $destPath >$null
+                & attrib -R -S $destPath >$null
                 # Take ownership and grant full control
-                takeown /F $destPath /A >$null
-                icacls $destPath /grant Administrators:F >$null
+                & takeown /F $destPath /A >$null
+                & icacls $destPath /grant "*S-1-5-32-544:F" /Q
             }
             Copy-Item -Path $_.FullName -Destination $destPath -Force -Verbose:$verbose
         }
