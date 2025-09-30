@@ -101,7 +101,7 @@ It is recommended however for new users to use the simple method below
 
 4. **--Download Windows Install Media--**
    
-   Download either ([Official](https://www.microsoft.com/en-us/software-download/windows11) Windows Install Media (Easy) or create a [UUP dump](https://uupdump.net) ISO file (Advanced) and keep it in a easy to find location like your Downloads folder.
+   Download either [Official](https://www.microsoft.com/en-us/software-download/windows11) Windows Install Media (Easy) or create a [UUP dump](https://uupdump.net) ISO file (Advanced) and keep it in a easy to find location like your Downloads folder.
 
 5. **--Select Desired Debloat Tools (Optional)--**
 
@@ -163,7 +163,7 @@ It is recommended however for new users to use the simple method below
 - **UUP Dump Project** - Both useful project in general, and their scripts helped to understand customizing Windows images, as well as building the ISO file.
 - **Hiren's Boot CD PE** - Learned and still learning amazing things done in Hiren's BootCD project. Easily the best multi-purpose boot utility kit out there. [Link](https://www.hirensbootcd.org)
 
-- **Alpha/Beta Testers** - Valuable feedback:
+- **Alpha/Beta Testers:**
   - Aeros Endeem
   - Sky (Skybox Monster)
   - Lord Flame Stryke
@@ -172,7 +172,7 @@ It is recommended however for new users to use the simple method below
   - Lirg
 
 ## Message to Debloat Tool Developers
-If you are interested in adding your Debloat Tool to MurrpTools, please read the "Developers of Debloat Tools ReadMe.md" file in this repo.
+If you are interested in adding your Debloat Tool to MurrpTools, please read the [Developers of Debloat Tools ReadMe.md](https://github.com/Davwyn/MurrpTools-WinKit/blob/main/Developers%20of%20Debloat%20Tools%20ReadMe.md) file in this repo.
 
 You can either send a Pull Request to edit DebloatTools.json, or open an Issue supplying all of the details of your debloat tool to be included.
 
