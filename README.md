@@ -56,10 +56,8 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 
 ## Getting Started Guide
 
-💡 Tip: As always when using Windows installation software. Make sure you back up any computer you plan to use MurrpTools on.
-   Reinstalling windows, or using tools to erase the disk will result in data loss.
-
-⚠ **Warning:** This project still being tested. - Use at your own risk. Always backup data before use.
+💡 **Important Tip: As always when using Windows installation software. Make sure you back up any computer you plan to use MurrpTools on.
+   Reinstalling windows, or using tools to erase the disk will result in data loss.**
 
 
 1. **--Download the Software--**
