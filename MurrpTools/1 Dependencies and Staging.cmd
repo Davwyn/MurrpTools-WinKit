@@ -4,4 +4,4 @@ if not exist "%~dp01 Dependencies and Staging.ps1" (
   pause
   exit /b 1
 )
-powershell.exe -ExecutionPolicy Bypass -File "%~dp01 Dependencies and Staging.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp01 Dependencies and Staging.ps1"

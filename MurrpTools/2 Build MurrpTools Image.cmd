@@ -4,4 +4,4 @@ if not exist "%~dp02 Build MurrpTools Image.ps1" (
   pause
   exit /b 1
 )
-powershell.exe -ExecutionPolicy Bypass -File "%~dp02 Build MurrpTools Image.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp02 Build MurrpTools Image.ps1"

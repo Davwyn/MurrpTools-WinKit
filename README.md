@@ -47,7 +47,7 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 - **OS**: Windows 10/11 (64-bit) build environment
 - **Tools**:
   - DISM *Built into Windows
-  - Windows PowerShell 5.1+
+  - Windows PowerShell 5.1+ or PowerShell 7 on Windows
 - **Storage**: 15GB free space minimum
 - **Windows Install Media**: Windows 10 22H2/11 ISO ([Official](https://www.microsoft.com/en-us/software-download/windows11) or [UUP dump](https://uupdump.net))
 
@@ -60,46 +60,26 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
    Reinstalling windows, or using tools to erase the disk will result in data loss.**
 
 
+**Advanced Users Only**
+If you are an Power User that knows how to use PowerShell and want to use advanced features or automate you can clone this repo and use the `Get-Help` command on the two respective PowerShell scripts for full details such as pre-supplying answers to automate ISO generation.
+
+It is recommended however for new users to use the simple method below
+
+
 1. **--Download the Software--**
    
-   **-Option 1 - Simple ZIP Download-**
    1. Download the latest release zip:
       
       <a href="https://github.com/Davwyn/MurrpTools-WinKit/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/Davwyn/MurrpTools-WinKit?display_name=release&style=for-the-badge"></a>
    2. Extract the ZIP file to your preferred location (e.g. Desktop)
 
-   **-Option 2 - Git Clone (For advanced Users)-**
-   ```powershell
-   git clone https://github.com/Dav-Edward/WinKit-MurrpTools.git
-   cd MurrpTools
-   ```
-
 2. **--Install Dependencies and Stage the building location--**
    
-   **Choose what works for you:**
-
-   🖱️ **-Simple Double-Click Method-**
    1. Go into the MurrpTools folder
    2. Find "1 Dependencies and Staging.cmd" in the folder
    3. You might need to right-click on the file and go into 'Properties'. If there is an 'Unblock' button push it. Otherwise just click OK.
    4. Right-click the file and select "Run as Administrator"
    5. Click "Yes" if asked for permission
-
-   💻 **-PowerShell Method (for advanced users)-**
-   1. Right-click the Start menu
-   2. Select "Windows Terminal (Admin)"
-   3. Copy/paste this command:
-   ```powershell
-   Set-ExecutionPolicy Bypass -Scope Process
-   & ".\MurrpTools\1 Dependencies and Staging.ps1" -BuildSelf
-   ```
-   or to build in a specific folder:
-   ```powershell
-   Set-ExecutionPolicy Bypass -Scope Process
-   # Murrptools creates a "MurrpTools" sub-directory at your BuildPath. You must select an existing directory.
-   & ".\MurrpTools\1 Dependencies and Staging.ps1" -BuildPath C:\Build
-   ```
-   In which you replace C:\Build with the path you'd like to build the project.
 
 3. **--Prepare Drivers--**
    
@@ -134,25 +114,12 @@ MurrpTools is an all-in-one Windows toolkit that helps both computer technicians
 
 
 6. **--Build MurrpTools Media--**
-    
-   **Choose your method:**
-
-   🖱️ **-Easy Method-**
+   
    Go to the folder you selected to unpack to back in step #2. If you choose to build at current location the script will be in the same folder.
    1. Find "2 Build MurrpTools Image.cmd" in the folder
    2. You might need to right-click on the file and go into 'Properties'. If there is an 'Unblock' button push it. Otherwise just click OK.
    3. Right-click the file and select "Run as Administrator"
    4. Follow the prompts, you will be asked for the Windows Install Media ISO file, using the file picker that opens select the ISO file you downloaded earlier.
-
-   💻 **-PowerShell Method (For advanced users)-**
-   Go to the folder you selected to unpack to back in step #2. If you choose to build at current location the script will be in the same folder.
-   1. Right-click the Start menu
-   2. Select "Windows Terminal (Admin)"
-   3. Copy/paste this command:
-   ```powershell
-   Set-ExecutionPolicy Bypass -Scope Process
-   & ".\MurrpTools\2 Build MurrpTools Image.ps1" -IsoImage "C:\path\to\windows.iso"
-   ```
 
 7. **--Image MurrpTools to Flash Drive--**
 
@@ -214,7 +181,9 @@ The base MurrpTools project has been developed souly by myself, Davwyn.
 
 I would greatly appreciate help from other developers in the following categories:
 
-- Bug hunting/fixing: If you can find something wrong, please share or make a pull request
+- Star this Repo: If you like MurrpTools at the top-right of the Repo page on GitHub click the Star icon to show you like it
+
+- Bug hunting/fixing: If you can find something wrong, please start a discussion or make a pull request
 
 - Code improvements: If you can offer code improvements please create an Issue or Pull Request and I'll review it when I can
 
