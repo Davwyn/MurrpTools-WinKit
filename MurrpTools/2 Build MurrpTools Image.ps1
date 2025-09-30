@@ -82,36 +82,6 @@ function Write-WarningLog {
     Write-Host "[WARNING] $message" -ForegroundColor Yellow
 }
 
-function Exit-Script {
-    param(
-        [bool]$isSuccess
-    )
-
-    Write-Host "`nScript Summary:"
-    if ($Script:errorLog.Count -gt 0) {
-        Write-Host "Errors encountered:" -ForegroundColor Red
-        $Script:errorLog | ForEach-Object { Write-Host "  - $_" }
-    }
-    if ($Script:warningLog.Count -gt 0) {
-        Write-Host "Warnings encountered:" -ForegroundColor Yellow
-        $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
-    }
-    
-    if (Get-PSDrive -Name "BuildDrive" -ErrorAction SilentlyContinue) {
-        Remove-PSDrive -Name "BuildDrive" -Force -ErrorAction SilentlyContinue
-    }
-
-    if ($isSuccess) {
-        Write-Host "`nScript completed successfully" -ForegroundColor Green
-        Read-Host -Prompt "Press enter to continue..."
-        exit 0
-    } else {
-        Write-Host "`nScript failed" -ForegroundColor Red
-        Read-Host -Prompt "Press enter to continue..."
-        exit 1
-    }
-}
-
 function Cleanup {
     # 1. Check for mounted WIM
     if (Get-ChildItem $mountDir -ErrorAction SilentlyContinue) {
@@ -150,6 +120,40 @@ function Cleanup {
     }
 }
 
+function Exit-Script {
+    param(
+        [bool]$isSuccess
+    )
+    if (-not $isSuccess) {
+        Write-Host "`nAn error occurred. Initiating cleanup..." -ForegroundColor Yellow
+        Cleanup
+    }
+
+    Write-Host "`nScript Summary:"
+    if ($Script:errorLog.Count -gt 0) {
+        Write-Host "Errors encountered:" -ForegroundColor Red
+        $Script:errorLog | ForEach-Object { Write-Host "  - $_" }
+    }
+    if ($Script:warningLog.Count -gt 0) {
+        Write-Host "Warnings encountered:" -ForegroundColor Yellow
+        $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
+    }
+    
+    if (Get-PSDrive -Name "BuildDrive" -ErrorAction SilentlyContinue) {
+        Remove-PSDrive -Name "BuildDrive" -Force -ErrorAction SilentlyContinue
+    }
+
+    if ($isSuccess) {
+        Write-Host "`nScript completed successfully" -ForegroundColor Green
+        Read-Host -Prompt "Press enter to continue..."
+        exit 0
+    } else {
+        Write-Host "`nScript failed" -ForegroundColor Red
+        Read-Host -Prompt "Press enter to continue..."
+        exit 1
+    }
+}
+
 function Initialize-Directories {    
     try {
         # Create mount directory at script location
@@ -158,7 +162,6 @@ function Initialize-Directories {
     }
     catch {
         Write-ErrorLog "Failed to create mount directory: $_"
-        Cleanup
         Exit-Script $false
     }
 }
@@ -312,13 +315,11 @@ function Build-Image {
             Write-Host "ISO Image supplied as: $ISOImage"
         } catch {
             Write-ErrorLog "Failed to resolve ISO path: $_"
-            Cleanup
             Exit-Script $false
         }
         # Use provided ISO path
         if (-not (Test-Path -Path $ISOImage)) {
             Write-ErrorLog "Specified ISO file does not exist: $ISOImage"
-            Cleanup
             Exit-Script $false
         }
         $isoFile = Get-Item $ISOImage
@@ -337,7 +338,6 @@ function Build-Image {
         }
         else {
             Write-WarningLog "Operation aborted by user."
-            Cleanup
             Exit-Script $false
         }
     }
@@ -361,7 +361,6 @@ function Build-Image {
     }
     catch {
         Write-ErrorLog "Failed to process ISO file: $_"
-        Cleanup
         Exit-Script $false
     }
     finally {
@@ -385,7 +384,6 @@ function Mount-Wim {
     }
     catch {
         Write-ErrorLog "Failed to mount WIM: $_"
-        Cleanup
         Exit-Script $false
     }
 }
@@ -418,7 +416,6 @@ function Add-Customizations {
     }
     catch {
         Write-ErrorLog "Failed to add customizations: $_"
-        Cleanup
         Exit-Script $false
     }
 }
@@ -463,7 +460,6 @@ function Add-Packages {
         }
         catch {
             Write-ErrorLog "Failed to add package $package`: $_"
-            Cleanup
             Exit-Script $false
         }
     }
@@ -486,7 +482,6 @@ function Add-Services {
     }
     catch {
         Write-ErrorLog "Failed to configure services: $_"
-        Cleanup
         Exit-Script $false
     }
 }
@@ -503,9 +498,23 @@ function Add-Drivers {
         Write-Host "`nDrivers added successfully."
     }
     catch {
-        Write-ErrorLog "Failed to add drivers: $_"
-        Cleanup
-        Exit-Script $false
+        Write-Host ""
+        if (-not $ISOImage) {
+            Write-Warning "Failed to add some drivers due to the following error: $_"
+            Write-Host "`nIt is typical for some drivers to fail to be added. If most drivers above succeeded, you can choose to continue.`nOtherwise if no drivers were added there might be something wrong.`n"
+            $ContinueOnError = Read-Host "Would you like to continue with what drivers were added? (Y/N)"
+            if ($ContinueOnError -notin @("Y", "y", "Yes", "yes")) {
+                Write-ErrorLog "Operation aborted by user due to driver addition failure."
+                Exit-Script $false
+            } else {
+                Write-Host "Continuing with current drivers..." -ForegroundColor Yellow
+                Start-Sleep 2
+            }
+        } else {
+            Write-Warning "Failed to add some drivers due to the following error: $_"
+            Write-Host "Continuing current drivers..." -ForegroundColor Yellow
+            Start-Sleep 5
+        }
     }
 }
 
@@ -517,7 +526,6 @@ function Set-ScratchSpace {
     }
     catch {
         Write-ErrorLog "Failed to set scratch space: $_"
-        Cleanup
         Exit-Script $false
     }
 }
@@ -555,7 +563,6 @@ function Add-MediaFiles {
     }
     catch {
         Write-ErrorLog "Failed to add media files: $_"
-        Cleanup
         Exit-Script $false
     }
 }
@@ -569,7 +576,6 @@ function Add-DebloatTools {
 
     if (-not (Test-Path -Path $debloatToolsFile)) {
         Write-ErrorLog "DebloatTools.json not found at $debloatToolsFile"
-        Cleanup
         Exit-Script $false
     }
 
@@ -690,7 +696,6 @@ function Add-DebloatTools {
         Write-Host "`nDebloat Tools configuration updated successfully."
     } catch {
         Write-ErrorLog "Failed to add Debloat Tools: $_"
-        Cleanup
         Exit-Script $false
     }
 }
@@ -714,7 +719,6 @@ function Build-MurrpToolsISO {
     }
     catch {
         Write-ErrorLog "Failed to add media files: $_"
-        Cleanup
         Exit-Script $false
     }
 }
