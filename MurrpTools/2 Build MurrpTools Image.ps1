@@ -33,7 +33,7 @@ param (
     [string]$ISOImage
 )
 
-$MurrpToolsVersion = "v1.1.1"
+$MurrpToolsVersion = "v1.1.2"
 
 function Join-PathImproved {
     param (
