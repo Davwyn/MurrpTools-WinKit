@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v1.1.2"
+$MurrpToolsVersion = "v1.1.3"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
@@ -49,6 +49,37 @@ if ($env:OS -notlike "*Windows*") {
     Write-Host "Please use a Windows system and try again." -ForegroundColor Yellow
     Read-Host -Prompt "Press enter to continue..."
     exit 1
+}
+
+function Exit-Script {
+    param(
+        [bool]$isSuccess
+    )
+
+    Write-Host "`nScript Summary:"
+    if ($Script:errorLog.Count -gt 0) {
+        Write-Host "Errors encountered:" -ForegroundColor Red
+        $Script:errorLog | ForEach-Object { Write-Host "  - $_" }
+    }
+    if ($Script:warningLog.Count -gt 0) {
+        Write-Host "Warnings encountered:" -ForegroundColor Yellow
+        $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
+    }
+
+    if ($isSuccess) {
+        Write-Host "`nScript completed successfully" -ForegroundColor Green
+        if ((!($BuildPath)) -and (!($BuildSelf))) {
+            Read-Host -Prompt "Press enter to continue..."
+        } else {
+            Write-Host "`nScript will exit in 5 seconds..." -ForegroundColor Green
+            Start-Sleep -Seconds 5
+        }
+        exit 0
+    } else {
+        Write-Host "`nScript failed" -ForegroundColor Red
+        Read-Host -Prompt "Press enter to continue..."
+        exit 1
+    }
 }
 
 function Join-PathImproved {
@@ -103,32 +134,6 @@ function Write-WarningLog {
     param($message)
     $Script:warningLog += $message
     Write-Host "[WARNING] $message" -ForegroundColor Yellow
-}
-
-function Exit-Script {
-    param(
-        [bool]$isSuccess
-    )
-
-    Write-Host "`nScript Summary:"
-    if ($Script:errorLog.Count -gt 0) {
-        Write-Host "Errors encountered:" -ForegroundColor Red
-        $Script:errorLog | ForEach-Object { Write-Host "  - $_" }
-    }
-    if ($Script:warningLog.Count -gt 0) {
-        Write-Host "Warnings encountered:" -ForegroundColor Yellow
-        $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
-    }
-
-    if ($isSuccess) {
-        Write-Host "`nScript completed successfully" -ForegroundColor Green
-        Read-Host -Prompt "Press enter to continue..."
-        exit 0
-    } else {
-        Write-Host "`nScript failed" -ForegroundColor Red
-        Read-Host -Prompt "Press enter to continue..."
-        exit 1
-    }
 }
 
 function Write-CompletionFile {
@@ -505,13 +510,12 @@ Write-Host "`nPlease now navigate to $(Join-PathImproved $($BuildLocation) 'Murr
 Write-Host "`nAdd any desired Windows PE Drivers to the WinPE_Drivers folder.`nIf you need help finding drivers, check the ReadMe file in that folder."
 Write-Host "`nYou can also enable or disable any desired Debloat Tools by editing the DebloatTools.json file in the MurrpTools folder."
 Write-Host "`n`nOnce you are ready to build, run the '2 Build Windows Image.ps1' (or .cmd) script."
-if (!($BuildPath)) {
+if ((!($BuildPath)) -and (!($BuildSelf))) {
     if ($BuildLocation -ne $MurrpToolsScriptPath) {
+        Write-Host "`nNote: If you staged MurrpTools to a different location, ensure you run the build script from that location." -ForegroundColor Yellow
         Write-Host "`nPress any key to open the MurrpTools Build folder..."
         Read-Host -Prompt "Press enter to continue..."
         Start-Process -FilePath "Explorer.exe" -ArgumentList $BuildLocation
-        Exit-Script $true
-    } else {
-        Exit-Script $true
     }
 }
+Exit-Script $true

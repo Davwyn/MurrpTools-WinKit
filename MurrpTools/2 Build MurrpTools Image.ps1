@@ -33,7 +33,47 @@ param (
     [string]$ISOImage
 )
 
-$MurrpToolsVersion = "v1.1.2"
+$MurrpToolsVersion = "v1.1.3"
+
+function Exit-Script {
+    param(
+        [bool]$isSuccess
+    )
+    if (-not $isSuccess) {
+        Write-Host "`nAn error occurred. Initiating cleanup..." -ForegroundColor Yellow
+        Cleanup
+    }
+
+    Write-Host "`nScript Summary:"
+    if ($Script:errorLog.Count -gt 0) {
+        Write-Host "Errors encountered:" -ForegroundColor Red
+        $Script:errorLog | ForEach-Object { Write-Host "  - $_" }
+    }
+    if ($Script:warningLog.Count -gt 0) {
+        Write-Host "Warnings encountered:" -ForegroundColor Yellow
+        $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
+    }
+    
+    if (Get-PSDrive -Name "BuildDrive" -ErrorAction SilentlyContinue) {
+        Remove-PSDrive -Name "BuildDrive" -Force -ErrorAction SilentlyContinue
+    }
+
+    if ($isSuccess) {
+        Write-Host "`nScript completed successfully" -ForegroundColor Green
+        if ($ISOImage) {
+            Write-Host "`nScript will exit in 5 seconds..." -ForegroundColor Green
+            Start-Sleep -Seconds 5
+            exit 0
+        } else {
+            Read-Host -Prompt "Press enter to continue..."
+            exit 0
+        }
+    } else {
+        Write-Host "`nScript failed" -ForegroundColor Red
+        Read-Host -Prompt "Press enter to continue..."
+        exit 1
+    }
+}
 
 function Join-PathImproved {
     param (
@@ -117,40 +157,6 @@ function Cleanup {
         } catch {
             Write-ErrorLog "Failed to unmount ISO: $_"
         }
-    }
-}
-
-function Exit-Script {
-    param(
-        [bool]$isSuccess
-    )
-    if (-not $isSuccess) {
-        Write-Host "`nAn error occurred. Initiating cleanup..." -ForegroundColor Yellow
-        Cleanup
-    }
-
-    Write-Host "`nScript Summary:"
-    if ($Script:errorLog.Count -gt 0) {
-        Write-Host "Errors encountered:" -ForegroundColor Red
-        $Script:errorLog | ForEach-Object { Write-Host "  - $_" }
-    }
-    if ($Script:warningLog.Count -gt 0) {
-        Write-Host "Warnings encountered:" -ForegroundColor Yellow
-        $Script:warningLog | ForEach-Object { Write-Host "  - $_" }
-    }
-    
-    if (Get-PSDrive -Name "BuildDrive" -ErrorAction SilentlyContinue) {
-        Remove-PSDrive -Name "BuildDrive" -Force -ErrorAction SilentlyContinue
-    }
-
-    if ($isSuccess) {
-        Write-Host "`nScript completed successfully" -ForegroundColor Green
-        Read-Host -Prompt "Press enter to continue..."
-        exit 0
-    } else {
-        Write-Host "`nScript failed" -ForegroundColor Red
-        Read-Host -Prompt "Press enter to continue..."
-        exit 1
     }
 }
 
@@ -706,19 +712,46 @@ function Build-MurrpToolsISO {
         $oscdimg = Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "oscdimg.exe"
         $ExistingMurrpToolsISO = Get-ChildItem -Path $MurrpToolsScriptPath -Name "MurrpTools*.iso"
         if ($ExistingMurrpToolsISO) { 
-            Write-Host "Removing existing MurrpTools.iso file"
+            Write-Host "Removing existing MurrpTools ISO file"
             $ExistingMurrpToolsISO | Remove-Item -Force -ErrorAction Stop -Verbose:$verbose
         }
         if (!(Test-Path -Path $oscdimg)) {
-            throw "$oscdimg is missing. Unable to create ISO file."
+            Write-ErrorLog "$oscdimg is missing. Unable to create ISO file."
+            Exit-Script $false
         }
         Write-Verbose "MurrpTools ISO Path: $(Join-PathImproved -Path1 $MurrpToolsScriptPath -Path2 "MurrpTools_$MurrpToolsVersion.iso")"
         Write-Verbose "Boot Media Directory: $bootMediaDir"
-        Start-Process -FilePath $oscdimg -ArgumentList "-bootdata:2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`" -o -m -u2 -udfver102 -lMurrpTools_$MurrpToolsVersion `"$bootMediaDir`" `"MurrpTools_$MurrpToolsVersion.iso`"" -Wait -NoNewWindow -ErrorAction Stop -Verbose:$verbose
+        # Get the Last Modified date from the install.esd or install.wim file to use as the ISO timestamp
+        $InstallWIMPath = Join-PathImproved -Path1 $bootMediaDir -Path2 "sources\install.esd"
+        if (-not (Test-Path -Path $InstallWIMPath)) {
+            $InstallWIMPath = Join-PathImproved -Path1 $bootMediaDir -Path2 "sources\install.wim"
+            if (-not (Test-Path -Path $InstallWIMPath)) {
+                Write-ErrorLog "Neither install.esd nor install.wim found in $($bootMediaDir)\sources"
+                Exit-Script $false
+            }
+        }
+        Write-Verbose "Install WIM Path: $InstallWIMPath"
+        # 1. Get the Modified date of the WIM file
+        $WIMMetadata = Get-WindowsImage -ImagePath $InstallWIMPath -Index 1
+        # Use ModifiedTime property for ISO timestamp
+        $mod = $WIMMetadata.ModifiedTime
+        $month = "{0:D2}" -f $mod.Month
+        $day = "{0:D2}" -f $mod.Day
+        $year = $mod.Year
+        $hour = "{0:D2}" -f $mod.Hour
+        $minute = "{0:D2}" -f $mod.Minute
+        $second = "{0:D2}" -f $mod.Second
+        # Compose isotime in MM/YYYY,HH:MM:SS format
+        $isotime = "$month/$day/$year,$hour`:$minute`:$second"
+        Write-Verbose "ISO Timestamp: $isotime"
+        # 2. Build the ISO using oscdimg
+        Write-Host "`nCreating ISO file..."
+        Start-Process -FilePath $oscdimg -ArgumentList "-bootdata:2#p0,e,b`"$bootMediaDir\boot\etfsboot.com`"#pEF,e,b`"$bootMediaDir\efi\Microsoft\boot\efisys.bin`" -o -m -u2 -udfver102 -t$isotime -lMurrpTools_$MurrpToolsVersion `"$bootMediaDir`" `"MurrpTools_$MurrpToolsVersion.iso`"" -Wait -NoNewWindow -ErrorAction Stop -Verbose:$verbose
         Write-Host "`nMurrpTools_$MurrpToolsVersion.iso built at $MurrpToolsScriptPath`n"
     }
     catch {
         Write-ErrorLog "Failed to add media files: $_"
+        Cleanup
         Exit-Script $false
     }
 }
