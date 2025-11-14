@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v1.1.3"
+$MurrpToolsVersion = "v1.2.0"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
@@ -398,7 +398,8 @@ $BuildSource_ProgramFiles = @(
     "Dependencies\WinNTSetup\WinNTSetup4",
     "Dependencies\Wipefile\Wipefile",
     "Dependencies\Mozilla\Firefox",
-    "Dependencies\VideoLAN\VLC"
+    "Dependencies\VideoLAN\VLC",
+    "Dependencies\CrystalMark\Crystal Disk Info"
 ) | ForEach-Object { Join-PathImproved $ProjectRootPath $_ }
 
 $BuildSource_Windows = @(
@@ -412,7 +413,8 @@ $BuildSource_System32 = @(
     "Dependencies\Sysinternals\pslist64.exe",
     "Dependencies\Sysinternals\pskill64.exe",
     "Dependencies\Sysinternals\BGInfo\Bginfo64.exe",
-    "Dependencies\CMartinezone\BitLockerUtility\BitLockerUtility.ps1"
+    "Dependencies\CMartinezone\BitLockerUtility\BitLockerUtility.ps1",
+    "Dependencies\Putty\Putty.exe"
 ) | ForEach-Object { Join-PathImproved $ProjectRootPath $_ }
 
 $BuildSource_DebloatTools = @(

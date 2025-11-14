@@ -41,6 +41,7 @@ function Ask-YesNoQuestion {
 
 function Get-WindowsImages {
     $WindowsImages = @()
+    $TargetImage = $null
     
     # Get all drives except X:
     $drives = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Name -ne 'X' }
@@ -63,7 +64,7 @@ function Get-WindowsImages {
     } elseif ($WindowsImages.Count -gt 1) {
         $TargetImage = $null
         $selection = $null
-        while ($selection -eq $null) {
+        while ($null -eq $selection) {
             Write-Host "`nMultiple Windows installations found:"
             for ($i = 0; $i -lt $WindowsImages.Count; $i++) {
                 Write-Host "$($i + 1): $($WindowsImages[$i])"
@@ -107,7 +108,7 @@ if ($ChoiceExportDrivers -eq $true) {
     if ($FindOfflineImage) {
         #Offline Driver Harvesting from ZF WinKit
         $TargetImage = Get-WindowsImages
-        if ($TargetImage) {
+        if ($null -ne $TargetImage) {
             $TargetImageRoot = [System.IO.Path]::GetPathRoot($TargetImage)
             Write-Host "`nHarvesting Drivers from $TargetImage ...."
             Export-WindowsDriver -Path $TargetImageRoot -SystemDrive $TargetImageRoot -Destination $DriverExportPath -LogLevel 2

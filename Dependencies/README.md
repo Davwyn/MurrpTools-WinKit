@@ -195,3 +195,15 @@ https://winntsetup.en.lo4d.com/windows
 File secure-erase utility.
 
 Website: https://www.gaijin.at/en/software/wipefile
+
+# Putty
+
+The universal terminal utility for SSH, Telnet and more.
+
+Website: https://www.chiark.greenend.org.uk/~sgtatham/putty/
+
+# Crystal Disk Info
+
+Utility to show Hard Disk SMART information and other data.
+
+Website: https://crystalmark.info/en/software/crystaldiskinfo/

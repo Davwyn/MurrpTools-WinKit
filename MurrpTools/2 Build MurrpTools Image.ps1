@@ -33,7 +33,7 @@ param (
     [string]$ISOImage
 )
 
-$MurrpToolsVersion = "v1.1.3"
+$MurrpToolsVersion = "v1.2.0"
 
 function Exit-Script {
     param(
