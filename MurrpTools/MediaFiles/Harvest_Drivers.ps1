@@ -17,6 +17,8 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     Exit
 }
 
+New-Variable -Name TargetImage -Value $null -Scope Script
+
 function Ask-YesNoQuestion {
     param (
         [string]$Question,
@@ -41,7 +43,6 @@ function Ask-YesNoQuestion {
 
 function Get-WindowsImages {
     $WindowsImages = @()
-    $TargetImage = $null
     
     # Get all drives except X:
     $drives = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Name -ne 'X' }
@@ -54,15 +55,13 @@ function Get-WindowsImages {
     }
     
     if ($WindowsImages.Count -eq 1) {
-        $TargetImage = $null
         $usePath = Ask-YesNoQuestion -Question "`nFound a single Windows installation: $($WindowsImages[0])`nDo you want to use this path for harvesting?" -DefaultResponse "Yes"
         if ($usePath) {
-            $TargetImage = $WindowsImages[0]
+            $Script:TargetImage = $WindowsImages[0]
         } else {
-            $TargetImage = $null
+            $Script:TargetImage = $null
         }
     } elseif ($WindowsImages.Count -gt 1) {
-        $TargetImage = $null
         $selection = $null
         while ($null -eq $selection) {
             Write-Host "`nMultiple Windows installations found:"
@@ -73,9 +72,9 @@ function Get-WindowsImages {
             $imageSelection = Read-Host "`nPlease select the target image by number"
             if ($imageSelection -match '^\d+$' -and $imageSelection -gt 0 -and $imageSelection -le $WindowsImages.Count) {
                 $selection = [int]$imageSelection - 1
-                $TargetImage = $WindowsImages[$selection]
+                $Script:TargetImage = $WindowsImages[$selection]
             } elseif ($imageSelection -eq ($WindowsImages.Count + 1).ToString()) {
-                $TargetImage = $null
+                $Script:TargetImage = $null
                 break
             } else {
                 Write-Host "`nInvalid selection. Please try again."
@@ -84,9 +83,9 @@ function Get-WindowsImages {
     } else {
         Write-Host "`n-----------`nWARNING: No Windows installations found for harvesting drivers.`n-----------`nPossibly the drive was encrypted with Bitlocker.`nIf the drive was encrypted with Bitlocker try the command: manage-bde -unlock c: -recoverypassword`nFollowed by the recovery key, or harvest the drivers while Windows is running.`n"
         Read-Host -Prompt "Press enter to continue..."
-        $TargetImage = $null
+        $Script:TargetImage = $null
     }
-    return $TargetImage
+    return
 }
 
 $border = "-" * 20
@@ -107,10 +106,10 @@ if (Test-Path $DriverExportPath) {
 if ($ChoiceExportDrivers -eq $true) {
     if ($FindOfflineImage) {
         #Offline Driver Harvesting from ZF WinKit
-        $TargetImage = Get-WindowsImages
-        if ($null -ne $TargetImage) {
-            $TargetImageRoot = [System.IO.Path]::GetPathRoot($TargetImage)
-            Write-Host "`nHarvesting Drivers from $TargetImage ...."
+        Get-WindowsImages
+        if ($null -ne $Script:TargetImage) {
+            $TargetImageRoot = [System.IO.Path]::GetPathRoot($Script:TargetImage)
+            Write-Host "`nHarvesting Drivers from $Script:TargetImage ...."
             Export-WindowsDriver -Path $TargetImageRoot -SystemDrive $TargetImageRoot -Destination $DriverExportPath -LogLevel 2
             <# # Get the list of drivers
             $drivers = Get-WindowsDriver -Path $TargetImageRoot -SystemDrive $TargetImageRoot        
