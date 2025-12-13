@@ -84,6 +84,7 @@ function Show-ToolDetails {
     Write-Host "Tool: $($Tool.Name)" -ForegroundColor Green
     Write-Host "Author: $($Tool.Author)" -ForegroundColor Green
     Write-Host "Website: $($Tool.Website)" -ForegroundColor Green
+    if (!([string]::IsNullOrWhiteSpace($($Tool.Notes)))) {Write-Host "Notes: " -ForegroundColor Green -NoNewline;Write-Host $($Tool.Notes) -ForegroundColor Yellow}
     Write-Host ""
     Write-Host $Tool.Description -ForegroundColor White
     Write-Host $Border -ForegroundColor Yellow

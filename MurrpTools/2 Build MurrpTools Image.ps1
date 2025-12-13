@@ -33,7 +33,7 @@ param (
     [string]$ISOImage
 )
 
-$MurrpToolsVersion = "v1.2.0"
+$MurrpToolsVersion = "v1.2.1"
 
 function Exit-Script {
     param(
@@ -666,7 +666,7 @@ function Add-DebloatTools {
                 # Validate the script
                 $fileExtension = [System.IO.Path]::GetExtension($toolScriptPath).ToLower()
                 if ($fileExtension -eq ".ps1") {
-                    if ((Get-Content -Path $toolScriptPath -TotalCount 20 -ErrorAction SilentlyContinue | ForEach-Object { $_.Trim() }) -match '^<#|^\s*function|^\s*\[CmdletBinding\(\)?\]') {
+                    if ((Get-Content -Path $toolScriptPath -TotalCount 20 -ErrorAction SilentlyContinue | ForEach-Object { $_.Trim() }) -match '^<#|^\s*function|^\s*\[CmdletBinding\(\)?\]|param') {
                         Write-Host "Successfully downloaded and validated script for $toolName. Marking as available offline." -ForegroundColor Green
                         $tool | Add-Member -MemberType NoteProperty -Name "AvailableOffline" -Value $true -Force
                     } else {

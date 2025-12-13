@@ -3,6 +3,7 @@
     "Name": "Davwyn's Debloater",
     "Enabled": true,
     "Description": "Debloat tool built by Davwyn designed specifically to work with MurrpTools to clean unwanted bloat from Windows 10 and Windows 11 before or after Windows starts for the first time.",
+    "Notes": "",
     "Author": "Davwyn",
     "Website": "https://github.com/Dav-Edward/DavwynsDebloater",
     "FolderName": "DavwynsDebloater",
@@ -14,7 +15,8 @@
   {
     "Name": "O&O ShutUp10++",
     "Enabled": true,
-    "Description": "Free antispy tool for Windows 10 and 11 that allows you to control the data that is sent to Microsoft and other companies.`n`nNote: If used during Windows Setup, only Local Machine settings will be applied. Current User settings will do nothing. Run again after setup to do Current User settings.",
+    "Description": "Free antispy tool for Windows 10 and 11 that allows you to control the data that is sent to Microsoft and other companies.",
+    "Notes": "If used during Windows Setup, only Local Machine settings will be applied. Current User settings will do nothing. Run again after setup to do Current User settings.",
     "Author": "O&O Software GmbH",
     "Website": "https://www.oosoftware.com/en/shutup10",
     "FolderName": "OandOShutUp10",
@@ -27,6 +29,7 @@
     "Name": "Chris Titus Tech's Windows Utility",
     "Enabled": true,
     "Description": "A powerful Windows Utility by Chris Titus designed to streamline Windows Installs, Debloat with Teats, Troubleshoot, and fix Windows Updates.",
+    "Notes": "",
     "Author": "Chris Titus",
     "Website": "https://github.com/ChrisTitusTech/winutil",
     "FolderName": "ChrisTitusTech",
@@ -34,5 +37,18 @@
     "DownloadFilename": "ChrisTitusTech.ps1",
     "Executeable": "ChrisTitusTech.ps1",
     "OOBESupported": false
+  },
+  {
+    "Name": "Zoicware Remove Windows AI Script",
+    "Enabled": true,
+    "Description": "Remove Windows AI script by Zoicware",
+    "Notes": "Do not select to restart the computer when finished if used during Windows Setup.",
+    "Author": "Zoicware",
+    "Website": "https://github.com/zoicware/RemoveWindowsAI",
+    "FolderName": "Zoicware",
+    "DownloadURL": "https://raw.githubusercontent.com/zoicware/RemoveWindowsAI/main/RemoveWindowsAi.ps1",
+    "DownloadFilename": "RemoveWindowsAi.ps1",
+    "Executeable": "RemoveWindowsAi.ps1",
+    "OOBESupported": true
   }
 ]
