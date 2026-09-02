@@ -39,7 +39,7 @@ param (
     [switch]$BuildSelf
 )
 
-$MurrpToolsVersion = "v1.2.2"
+$MurrpToolsVersion = "v1.2.3"
 
 $verbose = [bool]$PSCmdlet.MyInvocation.BoundParameters["Verbose"]
 
