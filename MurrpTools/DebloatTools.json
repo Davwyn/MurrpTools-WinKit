@@ -49,6 +49,6 @@
     "DownloadURL": "https://raw.githubusercontent.com/zoicware/RemoveWindowsAI/main/RemoveWindowsAi.ps1",
     "DownloadFilename": "RemoveWindowsAi.ps1",
     "Executeable": "RemoveWindowsAi.ps1",
-    "OOBESupported": true
+    "OOBESupported": false
   }
 ]
